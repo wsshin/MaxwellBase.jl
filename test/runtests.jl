@@ -1,6 +1,18 @@
 using MaxwellBase
 using Test
+using Statistics: mean
+using StaticArrays
 
-@testset "MaxwellBase.jl" begin
-    # Write your tests here.
-end
+Base.isapprox(a::Tuple, b::Tuple; kws...) = all(p -> isapprox(p...; kws...), zip(a,b))
+
+# @testset "MaxwellBase" begin
+
+include("enumtype.jl")
+include("util.jl")
+include("phys.jl")
+include("material.jl")
+include("object.jl")
+include("smoothing.jl")
+include("param.jl")
+
+# end  # @testset "MaxwellBase"
