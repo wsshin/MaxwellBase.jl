@@ -1,4 +1,5 @@
 # import Base:isapprox, dot
+export t_ind
 
 # Below, t_ind returns
 # - a tuple if the first argument is a tuple of tuple, and
