@@ -1,5 +1,5 @@
 # import Base:isapprox, dot
-export t_ind
+export t_ind, isfield_ortho_shape
 
 # Below, t_ind returns
 # - a tuple if the first argument is a tuple of tuple, and
