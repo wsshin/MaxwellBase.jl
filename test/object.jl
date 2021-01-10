@@ -33,7 +33,7 @@ end  # @testset "Object"
 #
 #     oind2obj = Object{3}[]
 #     pind2matprm = (SSComplex3[], SSComplex3[])
-#     add!(oind2obj, pind2matprm, obj_array)
+#     add_obj!(oind2obj, pind2matprm, obj_array)
 # end  # @testset "periodize"
 
 

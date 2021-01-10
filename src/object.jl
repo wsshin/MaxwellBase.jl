@@ -9,7 +9,7 @@
 # "extend" bounds for Shape by defining it as GeometryPrimitives.bounds(::Interval) = ....
 # Then, exporting bounds exports this whole collection of bounds, both for Shape and Interval.
 export OpenInterval, ClosedInterval, KDTree, Object
-export shape, matparam, max∆l, pint2matprmview, add!, periodize  #, surfpt_nearby, normal
+export shape, matparam, max∆l, pint2matprmview, add_obj!, periodize  #, surfpt_nearby, normal
 # export lsf, bound_, L_, center_, dist2bound, bound_contains, ∆lmax, sphere, transform,
 #     surfnormal, surfpoint  # functions
 # import Base:size, getindex, contains, isless, union, intersect
@@ -52,20 +52,20 @@ pint2matprmview(pind2matprm::AbsVec{<:SSComplex{Ke,Ke²}}, inds::AbsVecInteger) 
     [view(mp,inds,inds) for mp = pind2matprm]
 
 # Consider using resize! on oind2obj.
-function add!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-              pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},
-              objs::AbsVec{<:Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}}) where {K,Ke,Km,K²,Ke²,Km²}
+function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
+                  pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},
+                  objs::AbsVec{<:Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}}) where {K,Ke,Km,K²,Ke²,Km²}
     for obj = objs
-        add!(oind2obj, oind2pind, pind2matprm, obj)
+        add_obj!(oind2obj, oind2pind, pind2matprm, obj)
     end
 end
 
 # Consider using resize! on oind2obj.
-function add!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-              pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},
-              objs::Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}...) where {K,Ke,Km,K²,Ke²,Km²}
+function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
+                  pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},
+                  objs::Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}...) where {K,Ke,Km,K²,Ke²,Km²}
     for obj = objs
-        add!(oind2shp, oind2pind, pind2matprm, obj)
+        add_obj!(oind2shp, oind2pind, pind2matprm, obj)
     end
 end
 
@@ -81,10 +81,10 @@ end
 # Note that pind2matprm stores the same material parameter "value" only once.  Therefore,
 # if two objects are created with different Material instances with the same material
 # parameter tensor, then the two objects' materials are assigned with the same pind.
-function add!(oind2shp::AbsVec{Shape{K,K²}},  # initially empty vector
-              oind2pind::Tuple2{AbsVec{ParamInd}},  # tuple of initially empty vectors
-              pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},  # tuple of initially empty vectors
-              obj::Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}) where {K,Ke,Km,K²,Ke²,Km²}
+function add_obj!(oind2shp::AbsVec{Shape{K,K²}},  # initially empty vector
+                  oind2pind::Tuple2{AbsVec{ParamInd}},  # tuple of initially empty vectors
+                  pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},  # tuple of initially empty vectors
+                  obj::Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}) where {K,Ke,Km,K²,Ke²,Km²}
     push!(oind2shp, shape(obj))  # append obj (for potential use of oind2obj with KDTree, must use pushfirst! to prepend)
 
     # Assign the material parameter indices to obj.

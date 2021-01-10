@@ -28,7 +28,7 @@
     εind2ε = SSComplex3[]
     μind2μ = SSComplex3[]
 
-    add!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
+    add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
 
     # Construct arguments and call assign_param!.
     N = g3.N
@@ -94,7 +94,7 @@ end  # @testset "create_paramop"
     εind2ε = SSComplex3[]
     μind2μ = SSComplex3[]
 
-    add!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
+    add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
 
     # Construct arguments and call assign_param!.
     N = g3.N
