@@ -10,7 +10,9 @@ version = "0.1.0"
 
 [[GeometryPrimitives]]
 deps = ["LinearAlgebra", "StaticArrays", "Statistics"]
-path = "/Users/wsshin/Programming/GeometryPrimitives"
+git-tree-sha1 = "bdfa023f511d9779370551fe60d83cab3ef1bda5"
+repo-rev = "master"
+repo-url = "https://github.com/stevengj/GeometryPrimitives.jl"
 uuid = "17051e67-205e-509e-8301-03b320b998e6"
 version = "0.0.0"
 
@@ -38,8 +40,10 @@ deps = ["LinearAlgebra", "Random"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[StaggeredGridCalculus]]
-deps = ["AbbreviatedTypes", "LinearAlgebra", "Reexport", "SparseArrays", "StaticArrays"]
-path = "/Users/wsshin/Programming/StaggeredGridCalculus"
+deps = ["LinearAlgebra", "Reexport", "SparseArrays", "StaticArrays"]
+git-tree-sha1 = "d1739b173c6f55ff60519f401f311dda19018ea3"
+repo-rev = "master"
+repo-url = "https://github.com/wsshin/StaggeredGridCalculus.jl"
 uuid = "fead5d43-7759-5ac8-9dff-97135399d9eb"
 version = "0.0.0"
 
