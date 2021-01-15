@@ -17,22 +17,22 @@ export shape, matparam, max∆l, pint2matprmview, add_obj!, periodize  #, surfpt
 mutable struct Object{K,Ke,Km,S<:Shape{K},Ke²,Km²}  # K: dimension of space, (Ke,Km): dimension of electric and magnetic material parameters
     shp::S
     mat::Material{Ke,Km,Ke²,Km²}
-    ∆lmax::SVector{K,Float}
+    ∆lmax::SVec{K,Float}
     Object{K,Ke,Km,S,Ke²,Km²}(shp, mat, ∆lmax) where {K,Ke,Km,S,Ke²,Km²} = new(shp, mat, ∆lmax)
 end
 
-Object(shp::S, mat::Material{Ke,Km}, ∆lmax::SVector{K}=@SVector(fill(Inf,K))) where {K,Ke,Km,S<:Shape{K}} =
+Object(shp::S, mat::Material{Ke,Km}, ∆lmax::SVec{K}=@SVector(fill(Inf,K))) where {K,Ke,Km,S<:Shape{K}} =
     Object{K,Ke,Km,S,Ke*Ke,Km*Km}(shp, mat, ∆lmax)
-Object(shp::Shape{K}, mat::Material, ∆lmax::AbsVec) where {K} = Object(shp, mat, SVector{K}(∆lmax))
-Object(shp::Shape{K}, mat::Material, ∆lmax::Real) where {K} = Object(shp, mat, SVector(ntuple(k->∆lmax, Val(K))))
+Object(shp::Shape{K}, mat::Material, ∆lmax::AbsVec) where {K} = Object(shp, mat, SVec{K}(∆lmax))
+Object(shp::Shape{K}, mat::Material, ∆lmax::Real) where {K} = Object(shp, mat, SVec(ntuple(k->∆lmax, Val(K))))
 
 # Add a new convenience constructor
 GeometryPrimitives.Box(b::Tuple2{AbsVec}, axes=Matrix{Float}(I,length(b[1]),length(b[1]))) = Box((b[1]+b[2])/2, abs.(b[2]-b[1]), axes)
 
 # Create the user interface such that maxwellsys.add(shape, material, ∆lmax) uses this function.
 # setmat!(obj::Object, m::Material) = (obj.mat = m; obj)
-# setmax∆l!(obj::Object{K}, ∆lmax::AbsVec) where {K} = (obj.∆lmax = SVector{K}(∆lmax); obj)
-# setmax∆l!(obj::Object{K}, ∆lmax::Number) where {K} = setmax∆l!(obj, SVector(ntuple(k->∆lmax, Val(K))))
+# setmax∆l!(obj::Object{K}, ∆lmax::AbsVec) where {K} = (obj.∆lmax = SVec{K}(∆lmax); obj)
+# setmax∆l!(obj::Object{K}, ∆lmax::Number) where {K} = setmax∆l!(obj, SVec(ntuple(k->∆lmax, Val(K))))
 
 shape(obj::Object) = obj.shp
 matparam(obj::Object, ft::FieldType) = matparam(obj.mat, ft)

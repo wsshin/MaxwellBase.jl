@@ -1,7 +1,7 @@
 using MaxwellBase
 using Test
 using Statistics: mean
-using StaticArrays
+using AbbreviatedTypes
 
 Base.isapprox(a::Tuple, b::Tuple; kws...) = all(p -> isapprox(p...; kws...), zip(a,b))
 

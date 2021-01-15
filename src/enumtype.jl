@@ -4,9 +4,9 @@ export ft2gt  # functions
 
 # Field types
 const nE, nH = 1, 2  # E-, H-fields
-const nEH = SVector(nE, nH)
+const nEH = SVec(nE, nH)
 @enum FieldType EE=nE HH
-const EH = SVector(EE, HH)
+const EH = SVec(EE, HH)
 for ins in instances(FieldType); @eval export $(Symbol(ins)); end  # export all instances
 Base.string(ins::FieldType) = ins==EE ? "E" : "H"
 StaggeredGridCalculus.alter(ins::FieldType) = ins==EE ? HH : EE

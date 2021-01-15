@@ -88,10 +88,10 @@ end
 #     τ_temp = [@SVector(zeros(CFloat,K)) τ_temp2]
 #
 #     σcol_temp = @SVector [ε[i,1] for i = 2:K]
-#     σcol = [SVector{1,CFloat}(-1); σcol_temp]
+#     σcol = [SVec{1,CFloat}(-1); σcol_temp]
 #
 #     σrow_temp = @SVector [ε[1,j] for j = 2:K]
-#     σrow = [SVector{1,CFloat}(-1); σrow_temp]
+#     σrow = [SVec{1,CFloat}(-1); σrow_temp]
 #
 #     τ = τ_temp - (σcol * transpose(σrow)) ./ ε[1,1]
 #
