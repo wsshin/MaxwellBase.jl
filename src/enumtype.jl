@@ -13,6 +13,8 @@ StaggeredGridCalculus.alter(ins::FieldType) = ins==EE ? HH : EE
 
 # Given boundary field types, determine whether the grid planes specified by the given field
 # type ft are primal or dual grid planes in the Cartesian directions.
+# Note that the boundary field type is the type of the fields tangential to the boundary.
+# The fields defined on but normal to the boundary have the complementary type.
 ft2gt(ft::FieldType, boundft::FieldType) = PD[2 - (boundft==ft)]
 
 # Boundary conditions
