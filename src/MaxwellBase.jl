@@ -8,7 +8,7 @@ using Reexport
 using AbbreviatedTypes
 using Base.Threads: @threads  # used in param.jl
 
-export SSComplex1, SSComplex2, SSComplex3, ParamInd, ObjInd
+export SSComplex1, SSComplex2, SSComplex3, MatParam, ParamInd, ObjInd
 
 ## Type aliases
 # Below, use Int instead of Int64 for compatibility with 32-bit systems (e.g., x86 in appveyor.yml).
