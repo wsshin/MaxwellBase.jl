@@ -4,11 +4,11 @@ export PhysUnit, Oscillation  # types
 export c₀, μ₀, ε₀, η₀, ℎ, ℏ  # constants
 export in_L₀, in_ω₀, in_eV  # functions
 
-const c₀ = 2.99792458e8  # in m/s
-const μ₀ = 4e-7π  # in H/m
+const c₀ = 2.99_792_458e8  # in m/s
+const μ₀ = 1.256_637_062_12e-6  # in H/m; previously 4π×10⁻⁷ H/m; see 2019 redefinition of SI base units
 const ε₀ = 1 / (c₀^2 * μ₀)  # in F/m
 const η₀ = √(μ₀ /ε₀)  # in Ohm
-const ℎ = 4.13566733e-15  # in eV·sec
+const ℎ = 4.135_667_696e-15  # in eV·sec
 const ℏ = ℎ / 2π  # in eV·sec
 
 struct PhysUnit
