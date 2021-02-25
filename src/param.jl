@@ -32,6 +32,10 @@ function create_paramop(paramKd::AbsArrComplex{K₊₂},  # material parameter a
     M = prod(N)  # number voxels
 
     if Kf==1  # material parameter is scalar
+        # Averaging operators, which are required for calculating the fields interacting
+        # with off-diagonal entries of the material parameter tensor, are not used because
+        # all entries are on-diagonal.  Therefore, the arguments ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ,
+        # which are used for creating the averaging operators, are unused.
         kdiag = 0
         paramop = create_paramop_supdiag(paramKd, kdiag, N, order_cmpfirst=order_cmpfirst)  # diagonal components of material parameter tensor
     else  # Kf ≥ 2; material parameter is tensorial
