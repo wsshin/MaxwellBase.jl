@@ -302,8 +302,22 @@ function smooth_param_vxl(ci_vxl′::Tuple2{CartesianIndex{K}},
 
         if iszero(nout)
             # Give up Kottke's subpixel smoothing and take simple averaging.
-            prm_vxl = ft==EE ? amean_param(obj_cmp′, ci_vxl′, ft)::SSComplex{Kf,Kf²} :
-                               hmean_param(obj_cmp′, ci_vxl′, ft)::SSComplex{Kf,Kf²}
+            #
+            # Previously this part was using either arithmetic or harmonic averaging,
+            # depending on whether the field is on a primal or dual grid line.  The
+            # underlying assumption was that the primal voxels were filled uniformly with
+            # a single material, which is a common case when the user puts box-shaped
+            # objects in the domain.  Then, the material interface coincides with a primal
+            # grid plane, and the above choice of averaging scheme has some theoretical
+            # support.
+            #
+            # However, now it is no longer possible to deine each field as completely primal
+            # or completely dual.  For example, the Ez-field can be on the primal x-normal
+            # grid plane and dual y-normal grid plane simultaneously.  Therefore, it is no
+            # longer possible to select the averaging scheme based on whether the field is
+            # primal or dual, even if we assume each primal voxel is filled uniformly.
+            # Therefore, we simply perform arithmetic averaging regardless of the field type.
+            prm_vxl = amean_param(obj_cmp′, ci_vxl′, ft)::SSComplex{Kf,Kf²}
         else
             # Perform Kottke's subpixel smoothing (defined in material.jl).
             prm_vxl = isfield˔shp ? kottke_avg_param(prm_fg, prm_bg, rvol) :  # field is always parallel to shape boundaries
