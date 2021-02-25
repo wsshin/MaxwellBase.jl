@@ -11,9 +11,6 @@ using Base.Threads: @threads  # used in param.jl
 export SSComplex1, SSComplex2, SSComplex3, MatParam, ParamInd, ObjInd
 
 ## Type aliases
-# Below, use Int instead of Int64 for compatibility with 32-bit systems (e.g., x86 in appveyor.yml).
-const SSComplex{K,L} = SMatrix{K,K,CFloat,L}
-
 const SSComplex1 = SSComplex{1,1}
 const SSComplex2 = SSComplex{2,4}
 const SSComplex3 = SSComplex{3,9}
