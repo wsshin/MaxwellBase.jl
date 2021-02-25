@@ -110,8 +110,8 @@ function smooth_param!(paramKd::AbsArrComplex{K₊₂},  # parameter array to sm
                                                    lcmp, lcmp′, σcmp, ∆τcmp′, isfield˔shp)
                     else  # Nprm_vxl ≥ 3
                         # Give up Kottke's subpixel smoothing and take simple averaging.
-                        prm_vxl = ft==EE ? amean_param(ci_vxl′, oind_cmp′, oind2pind, pind2matprm)::SSComplex{Kf,Kf²} :
-                                           hmean_param(ci_vxl′, oind_cmp′, oind2pind, pind2matprm)::SSComplex{Kf,Kf²}
+                        # See the comments at the next usage of amean_param().
+                        prm_vxl = amean_param(ci_vxl′, oind_cmp′, oind2pind, pind2matprm)::SSComplex{Kf,Kf²}
                     end  # if Nprm_vxl == 2
 
                     # Below, we have four combinations depending on the values of Kf⏐₁ and Kf:
@@ -365,15 +365,15 @@ function amean_param(ci_vxl′::Tuple2{CartesianIndex{K}},
     return p / 2^K
 end
 
-function hmean_param(ci_vxl′::Tuple2{CartesianIndex{K}},
-                     oind_cmp′::AbsArr{ObjInd,K},  # object index array; does not change
-                     oind2pind::AbsVec{ParamInd},  # input map from oind to pind
-                     pind2matprm::AbsVec{SSComplex{Kf,Kf²}}  # map from pind to electric (magnetic) material parameters; Kf² = Kf^2
-                     ) where {K,Kf,Kf²}
-    p = SSComplex{Kf,Kf²}(ntuple(x->0, Val(Kf²)))
-    for ci = ci_vxl′[1]:ci_vxl′[2]
-        @inbounds pc = pind2matprm[oind2pind[oind_cmp′[ci]]]
-        p += inv(pc)
-    end
-    return inv(p / 2^K)
-end
+# function hmean_param(ci_vxl′::Tuple2{CartesianIndex{K}},
+#                      oind_cmp′::AbsArr{ObjInd,K},  # object index array; does not change
+#                      oind2pind::AbsVec{ParamInd},  # input map from oind to pind
+#                      pind2matprm::AbsVec{SSComplex{Kf,Kf²}}  # map from pind to electric (magnetic) material parameters; Kf² = Kf^2
+#                      ) where {K,Kf,Kf²}
+#     p = SSComplex{Kf,Kf²}(ntuple(x->0, Val(Kf²)))
+#     for ci = ci_vxl′[1]:ci_vxl′[2]
+#         @inbounds pc = pind2matprm[oind2pind[oind_cmp′[ci]]]
+#         p += inv(pc)
+#     end
+#     return inv(p / 2^K)
+# end
