@@ -23,7 +23,7 @@ create_field_array(N::SInt; ncmp::Int=3) = zeros(CFloat, N.data..., ncmp)
 # Below, permutedims(fKd, ...) create a new array, whereas reshape(fKd, :) doesn't.
 # Therefore, if implemented naively, this function creates a new array for order_cmpfirst =
 # true whereas it doesn't for order_cmpfirst = false.
-field_arr2vec(fKd::AbsArrNumber{K₊₁};  # field array; K₊₁ = K+1, where K is spatial dimension and 1 is dimension for Cartesian components
+field_arr2vec(fKd::AbsArrNumber{K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
               order_cmpfirst::Bool=true
               ) where {K₊₁} =
     order_cmpfirst ? reshape(permutedims(fKd, (K₊₁, ntuple(identity,Val(K₊₁-1))...)), :) : reshape(fKd,:)
