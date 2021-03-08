@@ -17,13 +17,18 @@ export create_field_array, field_arr2vec
 # Therefore, again the E[i,j,k,w] indexing scheme results in an operation on a more
 # contiguous block in memory space.
 
+create_field_array(N::AbsVecInteger; ncmp::Int=3) = create_field_array(SInt{length(N)}(N), ncmp=ncmp)
 create_field_array(N::SInt; ncmp::Int=3) = zeros(CFloat, N.data..., ncmp)
 
 
-# Below, permutedims(fKd, ...) create a new array, whereas reshape(fKd, :) doesn't.
-# Therefore, if implemented naively, this function creates a new array for order_cmpfirst =
-# true whereas it doesn't for order_cmpfirst = false.
+# Create a vector view of the field array.
+#
+# Note that reshape(fKd, :) creates a vector that shares the memory with fKd, i.e., if the
+# entries of the resulting vector change, the corresponding entries of fKd change as well.
+# Similarly, PermutedDimsArray(fKd, ...) creates a dimension-permuted array that shares the
+# memory with fKd.  On the other hand, a related function permutedims(fKd, ...) creates a
+# dimension-permuted array on a new memory space, so shouldn't be used.
 field_arr2vec(fKd::AbsArrNumber{K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
               order_cmpfirst::Bool=true
               ) where {K₊₁} =
-    order_cmpfirst ? reshape(permutedims(fKd, (K₊₁, ntuple(identity,Val(K₊₁-1))...)), :) : reshape(fKd,:)
+    order_cmpfirst ? reshape(PermutedDimsArray(fKd, (K₊₁, ntuple(identity,Val(K₊₁-1))...)), :) : reshape(fKd,:)
