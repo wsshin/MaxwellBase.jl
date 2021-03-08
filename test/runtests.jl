@@ -10,6 +10,7 @@ Base.isapprox(a::Tuple, b::Tuple; kws...) = all(p -> isapprox(p...; kws...), zip
 include("enumtype.jl")
 include("util.jl")
 include("phys.jl")
+include("field.jl")
 include("material.jl")
 include("object.jl")
 include("smoothing.jl")
