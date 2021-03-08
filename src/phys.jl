@@ -46,10 +46,13 @@ struct PhysUnit
     end
 end
 
-struct Oscillation
-    λ::CFloat
+struct Oscillation{T<:Union{Float,CFloat}}
+    λ::T
     unit::PhysUnit
+
+    Oscillation{T}(λ, unit) where {T} = new(λ, unit)
 end
+Oscillation(λ::T, unit::PhysUnit) where {T<:Number} = Oscillation{float(T)}(λ, unit)
 
 in_L₀(osc::Oscillation) = osc.λ
 in_ω₀(osc::Oscillation) = 2π / osc.λ
