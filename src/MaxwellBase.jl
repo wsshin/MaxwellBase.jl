@@ -6,6 +6,7 @@ module MaxwellBase
 using Reexport
 @reexport using LinearAlgebra, SparseArrays, StaggeredGridCalculus, GeometryPrimitives
 using AbbreviatedTypes
+using SimpleConstants
 using Base.Threads: @threads  # used in param.jl
 
 export SSComplex1, SSComplex2, SSComplex3, MatParam, ParamInd, ObjInd
