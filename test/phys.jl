@@ -1,9 +1,8 @@
 @testset "phys" begin
 
 L₀ = 1e-9
-λ = 1550
-unit = PhysUnit(L₀)
-osc = Oscillation(1550, unit)
+λ = 1550  # 1550L₀
+osc = Oscillation(1550, L₀)
 
 @test in_L₀(osc) ≈ λ
 @test in_ω₀(osc) ≈ 2π / λ

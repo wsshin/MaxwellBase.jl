@@ -1,6 +1,6 @@
 # Consider using Unitful.jl.
 
-export PhysUnit, Oscillation  # types
+export Oscillation  # types
 export in_L₀, in_ω₀, in_eV  # functions
 
 struct PhysUnit
@@ -38,13 +38,13 @@ struct PhysUnit
     end
 end
 
-struct Oscillation{T<:Union{Float,CFloat}}
+struct Oscillation{T<:Number}
     λ::T
     unit::PhysUnit
 
     Oscillation{T}(λ, unit) where {T} = new(λ, unit)
 end
-Oscillation(λ::T, unit::PhysUnit) where {T<:Number} = Oscillation{float(T)}(λ, unit)
+Oscillation(λ::T, L₀::Real) where {T<:Number} = Oscillation{float(T)}(λ, PhysUnit(L₀))  # support complex λ
 
 in_L₀(osc::Oscillation) = osc.λ
 in_ω₀(osc::Oscillation) = 2π / osc.λ
