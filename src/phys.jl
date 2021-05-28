@@ -1,51 +1,56 @@
 # Consider using Unitful.jl.
 
-export Oscillation  # types
-export in_L₀, in_ω₀, in_eV  # functions
-
 struct PhysUnit
-    L::Float
-    ω::Float
-    ε::Float
-    μ::Float
-    E::Float
-    H::Float
-    J::Float
-    M::Float
-    I::Float
-    V::Float
-    S::Float
-    P::Float
-    u::Float
+    # Quantities whose units are fundamental constants
+    ε::Float  # permittivity unit
+    μ::Float  # permeability unit
+    c::Float  # speed unit
+    η::Float  # impedance unit
+
+    # General quantities (not specific to electromagnetism)
+    L::Float  # length unit
+    ω::Float  # angular frequency unit
+
+    # Electromagnetic quantities, in order of frequency of appearance in Maxwell's equations
+    E::Float  # E-field unit
+    H::Float  # H-field unit
+
+    J::Float  # electric current density unit
+    M::Float  # magnetic current density unit
+
+    S::Float  # Poynting vector unit
+    P::Float  # power unit
+
+    V::Float  # voltage unit
+    I::Float  # electric current unit
 
     function PhysUnit(L₀::Real)
+        # The length unit L₀ is set by users.
         L₀ > 0 || throw(ArgumentError("L₀ = $L₀ must be positive."));
-        L = L₀;
-        ω = c₀ / L;  # frequency in rad/s (L0-dependent)
-        ε = ε₀;  # permittivity in eps0
-        μ = μ₀;  # permeability in mu0
-        E = 1.0;  # E-field in V/m
-        H = E / η₀;  # H-field in A/m
-        J = H / L;  # electric current density in A/m^2 (L0-dependent)
-        M = E / L;  # magnetic current density in A/m^2 (L0-dependent)
-        I = J * L^2;  # electric current in Amperes (L0-dependent)
-        V = E * L;  # voltage in Volts (L0-dependent)
-        S = E * H;  # Poynting vector in Watt/m^2
-        P = S * L^2;  # power in Watt (L0-dependent)
-        u = S / L;  # power density in Watt/m^3 (L0-dependent)
 
-        new(L,ω,ε,μ,E,H,J,M,I,V,S,P,u)
+        # The E-field unit is arbitrarily chosen as E₀ = 1 V/m.
+        E₀ = 1.0  # E-field is measured in V/m
+
+        # The following quantities are measured in their fundamental constants:
+        # - Permittivity is measured in vacuum permittivity ε₀
+        # - Permeability is measured in vacuum permeability μ₀
+        # - Speed is measured in speed c₀ of light in vacuum
+        # - Impedance is measured in vacuum impedance η₀ = √(μ₀/ε₀)
+
+        # The units of all the other quantities are derived from the above units, such that
+        # they are consistent with the above units in Maxwell's equations.  Among them, the
+        # following units are independent of the length unit L₀:
+        H₀ = E₀ / η₀  # H-field is measured in in E₀/η₀ (L₀-independent)
+        S₀ = E₀ * H₀  # Poynting vector is measured in E₀H₀ (L₀-independent)
+
+        # The following units are dependent on the length unit L₀:
+        ω₀ = c₀ / L₀  # frequency is measured in c₀/L₀
+        J₀ = H₀ / L₀  # electric current density is measured in H₀/L₀
+        M₀ = E₀ / L₀  # magnetic current density is measured in E₀/L₀
+        I₀ = J₀ * L₀^2  # electric current is measured in J₀L₀²
+        V₀ = E₀ * L₀  # voltage is measured in E₀L₀
+        P₀ = I₀ * V₀  # power is measured in I₀V₀ = S₀L₀²
+
+        new(ε₀, μ₀, c₀, η₀, L₀, ω₀, E₀, H₀, J₀, M₀, S₀, P₀, V₀, I₀)
     end
 end
-
-struct Oscillation{T<:Number}
-    λ::T
-    unit::PhysUnit
-
-    Oscillation{T}(λ, unit) where {T} = new(λ, unit)
-end
-Oscillation(λ::T, L₀::Real) where {T<:Number} = Oscillation{float(T)}(λ, PhysUnit(L₀))  # support complex λ
-
-in_L₀(osc::Oscillation) = osc.λ
-in_ω₀(osc::Oscillation) = 2π / osc.λ
-in_eV(osc::Oscillation) = ℎ * c₀ / (osc.λ * osc.unit.L)
