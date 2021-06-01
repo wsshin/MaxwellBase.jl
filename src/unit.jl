@@ -1,6 +1,7 @@
 # Consider using Unitful.jl.
+export MaxwellUnit
 
-struct PhysUnit
+struct MaxwellUnit
     # Quantities whose units are fundamental constants
     ε::Float  # permittivity unit
     μ::Float  # permeability unit
@@ -24,7 +25,7 @@ struct PhysUnit
     V::Float  # voltage unit
     I::Float  # electric current unit
 
-    function PhysUnit(L₀::Real)
+    function MaxwellUnit(L₀::Real)
         # The length unit L₀ is set by users.
         L₀ > 0 || throw(ArgumentError("L₀ = $L₀ must be positive."));
 

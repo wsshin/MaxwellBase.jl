@@ -25,7 +25,7 @@ const ObjInd = UInt16  # change this to handle more than 2¹⁶ = 65536 objects
 # must be included first.
 include("enumtype.jl")
 include("util.jl")
-include("phys.jl")
+include("unit.jl")
 include("material.jl")
 include("object.jl")
 include("field.jl")
