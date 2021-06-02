@@ -45,10 +45,10 @@
     μoo_oind3d = create_oind_array(N)
 
     boundft = SVec(EE,EE,EE)
-    assign_param!(ε3d, (μxx_oind3d,μyy_oind3d,μzz_oind3d), ft2gt.(EE,boundft), oind2shp, oind2εind, εind2ε, g3.ghosted.τl, g3.isbloch)
-    assign_param!(ε3d, tuple(μoo_oind3d), ft2gt.(EE,boundft), oind2shp, oind2εind, εind2ε, g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), ft2gt.(HH,boundft), oind2shp, oind2μind, μind2μ, g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, tuple(εoo_oind3d), ft2gt.(HH,boundft), oind2shp, oind2μind, μind2μ, g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, (μxx_oind3d,μyy_oind3d,μzz_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, tuple(μoo_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(μ3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), oind2shp, oind2μind, μind2μ, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(μ3d, tuple(εoo_oind3d), oind2shp, oind2μind, μind2μ, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
 
     # Perform smoothing.
     smooth_param!(ε3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
@@ -111,10 +111,10 @@ end  # @testset "create_paramop"
     μoo_oind3d = create_oind_array(N)
 
     boundft = SVec(EE,EE,EE)
-    assign_param!(ε3d, (μxx_oind3d,μyy_oind3d,μzz_oind3d), ft2gt.(EE,boundft), oind2shp, oind2εind, εind2ε, g3.ghosted.τl, g3.isbloch)
-    assign_param!(ε3d, tuple(μoo_oind3d), ft2gt.(EE,boundft), oind2shp, oind2εind, εind2ε, g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), ft2gt.(HH,boundft), oind2shp, oind2μind, μind2μ, g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, tuple(εoo_oind3d), ft2gt.(HH,boundft), oind2shp, oind2μind, μind2μ, g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, (μxx_oind3d,μyy_oind3d,μzz_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, tuple(μoo_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(μ3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), oind2shp, oind2μind, μind2μ, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(μ3d, tuple(εoo_oind3d), oind2shp, oind2μind, μind2μ, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
 
     # Perform smoothing.
     smooth_param!(ε3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
