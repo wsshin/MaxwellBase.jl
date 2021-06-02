@@ -58,7 +58,7 @@
     ∆l′ = g3.∆l[nPR]
     ∆l′⁻¹ = map(x->inv.(x), ∆l′)
 
-    Mε = create_paramop(ε3d, ft2gt.(EE,boundft), N, ∆l, ∆l′⁻¹, g3.isbloch, order_cmpfirst=true)
+    Mε = create_paramop(ε3d, ft2gt.(EE,boundft), ∆l, ∆l′⁻¹, g3.isbloch, order_cmpfirst=true)
 
     # @test issymmetric(Mε)
     @test Mε ≈ transpose(Mε)
@@ -124,7 +124,7 @@ end  # @testset "create_paramop"
     ∆l′ = g3.∆l[nPR]
     ∆l′⁻¹ = map(x->inv.(x), ∆l′)
 
-    Mε = create_paramop(ε3d, ft2gt.(EE,boundft), N, ∆l, ∆l′⁻¹, g3.isbloch, order_cmpfirst=true)
+    Mε = create_paramop(ε3d, ft2gt.(EE,boundft), ∆l, ∆l′⁻¹, g3.isbloch, order_cmpfirst=true)
 
     # Ml
     ∆lprim = g3.∆l[nPR]
