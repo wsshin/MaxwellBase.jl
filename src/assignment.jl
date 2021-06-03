@@ -18,6 +18,11 @@ export create_param_array, create_oind_array, assign_param!, assign_val_shape!
 
 # About the order of indices of paramKd
 #
+# (Bottom line: paramKd[i,j,k,v,w] uses a different indexing scheme than conventional
+# indexing scheme F[w,i,j,k] for vector field F; note that the polarization indices v and w
+# come last in paramKd, whereas the polarization index w comes first in F.  This is to speed
+# up the material parameter assignment.  See below.)
+#
 # paramKd has 5 indices for K = 3: the first three are positional indices (i,j,k) and the
 # last two are material parameter tensor component indices (v,w).  This mean paramKd[i,j,k,:,:]
 # is the 3×3 material tensor.
@@ -26,7 +31,10 @@ export create_param_array, create_oind_array, assign_param!, assign_val_shape!
 # For example, we usually write the xy-component of ε at a location (i,j,k) as ε_xy[i,j,k],
 # where the tesnor component subscripts v = x and w = y comes earlier than the positional
 # indices (i,j,k).  Similarly, the x-component of the E-field is usually written E_x[i,j,k],
-# not E[i,j,k]_x.
+# not E[i,j,k]_x.  (Also, the usual indexing scheme for vector fields is F[w,i,j,k].  This
+# puts the x-, y-, z-componnets of F at the same location (i,j,k) as adjacent entries of
+# the column vector F[:], which helps reducing the bandwidth of the matrix versions of local
+# differential operators acting on F.)
 #
 # However, when assigning the material parameters in the code in this file, we often assign
 # the same value to a block of paramKd.  This block is chosen differently for different
