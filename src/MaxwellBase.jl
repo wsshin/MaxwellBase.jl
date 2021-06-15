@@ -9,12 +9,12 @@ using AbbreviatedTypes
 using SimpleConstants
 using Base.Threads: @threads  # used in param.jl
 
-export SSComplex1, SSComplex2, SSComplex3, MatParam, ParamInd, ObjInd
+export SSComplexF1, SSComplexF2, SSComplexF3, MatParam, ParamInd, ObjInd
 
 ## Type aliases
-const SSComplex1 = SSComplex{1,1}
-const SSComplex2 = SSComplex{2,4}
-const SSComplex3 = SSComplex{3,9}
+const SSComplexF1 = SSComplexF{1,1}
+const SSComplexF2 = SSComplexF{2,4}
+const SSComplexF3 = SSComplexF{3,9}
 
 const MatParam = Union{Number,AbsVecNumber,AbsMatNumber}
 const ParamInd = UInt8  # change this to handle more than 2⁸ = 256 materials

@@ -19,7 +19,7 @@ export create_field_array, field_arr2vec, isfield_ortho_shape
 # contiguous block in memory space.
 
 create_field_array(N::AbsVecInteger; ncmp::Int=3) = create_field_array(SInt{length(N)}(N), ncmp=ncmp)
-create_field_array(N::SInt; ncmp::Int=3) = zeros(CFloat, N.data..., ncmp)
+create_field_array(N::SInt; ncmp::Int=3) = zeros(ComplexF, N.data..., ncmp)
 
 
 # Create a vector view of the field array.

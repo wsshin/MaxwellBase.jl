@@ -51,12 +51,12 @@ max∆l(obj::Object) = obj.∆lmax
 # We return a vector of submatrices rather than a vector of submatrix views, because
 # assign_param!() requires the entries of its argument pind2matprm to be SMatrix rather than
 # views of SMatrix.
-sub_pind2matprm(pind2matprm::AbsVec{<:SSComplex{Ke,Ke²}}, inds::AbsVecInteger) where {Ke,Ke²} =
+sub_pind2matprm(pind2matprm::AbsVec{<:SSComplexF{Ke,Ke²}}, inds::AbsVecInteger) where {Ke,Ke²} =
     [SMat{length(inds)}(mp[inds,inds]) for mp = pind2matprm]
 
 # Consider using resize! on oind2obj.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-                  pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},
+                  pind2matprm::Tuple{AbsVec{SSComplexF{Ke,Ke²}},AbsVec{SSComplexF{Km,Km²}}},
                   objs::AbsVec{<:Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}}) where {K,Ke,Km,K²,Ke²,Km²}
     for obj = objs
         add_obj!(oind2obj, oind2pind, pind2matprm, obj)
@@ -65,7 +65,7 @@ end
 
 # Consider using resize! on oind2obj.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-                  pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},
+                  pind2matprm::Tuple{AbsVec{SSComplexF{Ke,Ke²}},AbsVec{SSComplexF{Km,Km²}}},
                   objs::Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}...) where {K,Ke,Km,K²,Ke²,Km²}
     for obj = objs
         add_obj!(oind2shp, oind2pind, pind2matprm, obj)
@@ -86,7 +86,7 @@ end
 # parameter tensor, then the two objects' materials are assigned with the same pind.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}},  # initially empty vector
                   oind2pind::Tuple2{AbsVec{ParamInd}},  # tuple of initially empty vectors
-                  pind2matprm::Tuple{AbsVec{SSComplex{Ke,Ke²}},AbsVec{SSComplex{Km,Km²}}},  # tuple of initially empty vectors
+                  pind2matprm::Tuple{AbsVec{SSComplexF{Ke,Ke²}},AbsVec{SSComplexF{Km,Km²}}},  # tuple of initially empty vectors
                   obj::Object{K,Ke,Km,<:Shape{K,K²},Ke²,Km²}) where {K,Ke,Km,K²,Ke²,Km²}
     push!(oind2shp, shape(obj))  # append obj (for potential use of oind2obj with KDTree, must use pushfirst! to prepend)
 

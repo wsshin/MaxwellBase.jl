@@ -1,9 +1,9 @@
 @testset "material" begin
 
 @testset "tensorize" begin
-    @test MaxwellBase.tensorize(3, Val(2)) === SMatrix{2,2,Complex{Float64},4}(3,0,0,3)
-    @test MaxwellBase.tensorize([2,4], Val(2)) === SMatrix{2,2,Complex{Float64},4}(2,0,0,4)
-    @test MaxwellBase.tensorize([1 3; 2 4], Val(2)) === SMatrix{2,2,Complex{Float64},4}(1,2,3,4)
+    @test MaxwellBase.tensorize(3, Val(2)) === SMatrix{2,2,ComplexF64,4}(3,0,0,3)
+    @test MaxwellBase.tensorize([2,4], Val(2)) === SMatrix{2,2,ComplexF64,4}(2,0,0,4)
+    @test MaxwellBase.tensorize([1 3; 2 4], Val(2)) === SMatrix{2,2,ComplexF64,4}(1,2,3,4)
 end
 
 @testset "Material" begin
@@ -20,11 +20,11 @@ end
     # Check if τ_trans for a 2×2 matrix is τ_trans for the 3×3 version of the matrix.  The
     # 3×3 version needs to have the original 2×2 matrix as the top-left 2×2 block, and the
     # third row and column has the (3,3) entry as the only nonzero entry.
-    ε2 = @SMatrix rand(Complex{Float64}, 2, 2)
-    ε3temp = zeros(Complex{Float64}, 3, 3)
+    ε2 = @SMatrix rand(ComplexF64, 2, 2)
+    ε3temp = zeros(ComplexF64, 3, 3)
     ε3temp[1:2,1:2] .= ε2
-    ε3temp[3,3] = rand(Complex{Float64})
-    ε3 = MaxwellBase.SSComplex3(ε3temp)
+    ε3temp[3,3] = rand(ComplexF64)
+    ε3 = MaxwellBase.SSComplexF3(ε3temp)
 
     τ2 = MaxwellBase.τ_trans(ε2)
     τ3 = MaxwellBase.τ_trans(ε3)
