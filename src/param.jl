@@ -83,7 +83,7 @@ function create_paramop(paramKd::AbsArrComplex{K₊₂},  # material parameter a
         # segments.  The ∆l factors multiplied inside create_minfo cancel the effect of this
         # multiplication with the nonuniform line segments.  (See my notes on Jul/18/2018 in
         # MaxwellBase in Agenda.)
-        Min = create_mean(isfwd_in, N, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ, order_cmpfirst=order_cmpfirst)
+        Min = create_mean(isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ, order_cmpfirst=order_cmpfirst)
 
         # Off-diagonal components of material parameter tensor
         # Min and Mout are block-diagonal matrices, but create_paramop_supdiag() generates
