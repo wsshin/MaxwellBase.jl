@@ -25,8 +25,8 @@
     oind2shp = Shape3[]
     oind2εind = ParamInd[]
     oind2μind = ParamInd[]
-    εind2ε = SSComplexF3[]
-    μind2μ = SSComplexF3[]
+    εind2ε = S²ComplexF3[]
+    μind2μ = S²ComplexF3[]
 
     add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
 
@@ -91,8 +91,8 @@ end  # @testset "create_paramop"
     oind2shp = Shape3[]
     oind2εind = ParamInd[]
     oind2μind = ParamInd[]
-    εind2ε = SSComplexF3[]
-    μind2μ = SSComplexF3[]
+    εind2ε = S²ComplexF3[]
+    μind2μ = S²ComplexF3[]
 
     add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
 

@@ -5,11 +5,11 @@ import Base:string
 # Note that the output of tensorize is always a matrix: for K = 1, it is a 1×1 matrix.
 tensorize(x::Number, ::Val{K}) where {K} = tensorize(@SVector(fill(complex(x), K)), Val(K))  # SComplexF{3}(x,x,x): vector
 tensorize(v::AbsVecNumber, ::Val{K}) where {K} = diagm(Val(0)=>SComplexF{K}(v))  # complex(v) is allocating, so use SComplexF{K}(v)
-tensorize(m::AbsMatNumber, ::Val{K}) where {K} = SSComplexF{K,K*K}(m)  # complex(m) is allocating, so use SSComplexF{K,K*K}(m)
+tensorize(m::AbsMatNumber, ::Val{K}) where {K} = S²ComplexF{K,K*K}(m)  # complex(m) is allocating, so use S²ComplexF{K,K*K}(m)
 
 struct Material{Ke,Km,Ke²,Km²}  # e: electric, m: magnetic
     name::String
-    param::Tuple{SSComplexF{Ke,Ke²},SSComplexF{Km,Km²}}  # (material parameter interacting with E, material parameter interacting with H)
+    param::Tuple{S²ComplexF{Ke,Ke²},S²ComplexF{Km,Km²}}  # (material parameter interacting with E, material parameter interacting with H)
     Material{Ke,Km,Ke²,Km²}(name, param) where {Ke,Km,Ke²,Km²} =
         new(name, (tensorize(param[1],Val(Ke)), tensorize(param[2],Val(Km))))  # suppress default outer constructor
 end
@@ -22,13 +22,13 @@ string(m::Material) = m.name
 matparam(m::Material, ft::FieldType) = m.param[Int(ft)]
 
 kottke_avg_param(param1::AbsMatNumber, param2::AbsMatNumber, n12::AbsVecReal, rvol1::Real) =
-    (K = length(n12); kottke_avg_param(SSComplexF{K,K^2}(param1), SSComplexF{K,K^2}(param2), SFloat{K}(n12), rvol1))
+    (K = length(n12); kottke_avg_param(S²ComplexF{K,K^2}(param1), S²ComplexF{K,K^2}(param2), SFloat{K}(n12), rvol1))
 
 # Implement the averaging scheme between two local material parameter tensors developed in
 # the paper by Kottke, Farjadpour, Johnson entitled "Perturbation theory for anisotropic
 # dielectric interfaces, and application to subpixel smoothing of discretized numerical
 # methods", Physical Review E 77 (2008): 036611.
-function kottke_avg_param(param1::SSComplexF{K}, param2::SSComplexF{K}, n12::SFloat{K}, rvol1::Real) where {K}
+function kottke_avg_param(param1::S²ComplexF{K}, param2::S²ComplexF{K}, n12::SFloat{K}, rvol1::Real) where {K}
     Scomp = @SMatrix rand(K,K-1)  # directions complementary to n12; works even for K = 1
     Stemp = [n12 Scomp]  # SMatrix{K,K}
     S = qr(Stemp).Q  # nonallocating; 1st column is normalized n12
@@ -54,10 +54,10 @@ kottke_avg_param(param1::AbsMatNumber, param2::AbsMatNumber, rvol1::Real) =
     param1 .* rvol1 + param2 .* (1-rvol1)
 
 # Equation (4) of the paper by Kottke et al.  Need to verify for K = 1 and 2.
-function τ_trans(ε::SSComplexF3)
+function τ_trans(ε::S²ComplexF3)
     ε₁₁, ε₂₁, ε₃₁, ε₁₂, ε₂₂, ε₃₂, ε₁₃, ε₂₃, ε₃₃ = ε
 
-    return SSComplexF3(
+    return S²ComplexF3(
         -1/ε₁₁, ε₂₁/ε₁₁, ε₃₁/ε₁₁,
         ε₁₂/ε₁₁, ε₂₂ - ε₂₁*ε₁₂/ε₁₁, ε₃₂ - ε₃₁*ε₁₂/ε₁₁,
         ε₁₃/ε₁₁, ε₂₃ - ε₂₁*ε₁₃/ε₁₁, ε₃₃ - ε₃₁*ε₁₃/ε₁₁
@@ -71,18 +71,18 @@ function τ_trans(ε::SSComplexF3)
     # return t
 end
 
-function τ_trans(ε::SSComplexF2)
+function τ_trans(ε::S²ComplexF2)
     ε₁₁, ε₂₁, ε₁₂, ε₂₂ = ε
 
-    return SSComplexF2(
+    return S²ComplexF2(
         -1/ε₁₁, ε₂₁/ε₁₁,
         ε₁₂/ε₁₁, ε₂₂ - ε₂₁*ε₁₂/ε₁₁
     )
 end
 
-τ_trans(ε::SSComplexF1) = -1 ./ ε  # SSComplexF1
+τ_trans(ε::S²ComplexF1) = -1 ./ ε  # S²ComplexF1
 
-# function τ_trans(ε::SSComplexF{K}) where {K}
+# function τ_trans(ε::S²ComplexF{K}) where {K}
 #     τ_temp1 = @SMatrix [ε[i,j] for i = 2:K, j = 2:K]  # cannot use type parameter K here: error is generated
 #     τ_temp2 = [@SMatrix(zeros(ComplexF,1,K-1)); τ_temp1]
 #     τ_temp = [@SVector(zeros(ComplexF,K)) τ_temp2]
@@ -99,10 +99,10 @@ end
 # end
 
 # Equation (23) of the paper by Kottke et al.
-function τ⁻¹_trans(τ::SSComplexF3)
+function τ⁻¹_trans(τ::S²ComplexF3)
     τ₁₁, τ₂₁, τ₃₁, τ₁₂, τ₂₂, τ₃₂, τ₁₃, τ₂₃, τ₃₃ = τ
 
-    return SSComplexF3(
+    return S²ComplexF3(
         -1/τ₁₁, -τ₂₁/τ₁₁, -τ₃₁/τ₁₁,
         -τ₁₂/τ₁₁, τ₂₂ - τ₂₁*τ₁₂/τ₁₁, τ₃₂ - τ₃₁*τ₁₂/τ₁₁,
         -τ₁₃/τ₁₁, τ₂₃ - τ₂₁*τ₁₃/τ₁₁, τ₃₃ - τ₃₁*τ₁₃/τ₁₁
@@ -117,13 +117,13 @@ function τ⁻¹_trans(τ::SSComplexF3)
     # return s
 end
 
-function τ⁻¹_trans(τ::SSComplexF2)
+function τ⁻¹_trans(τ::S²ComplexF2)
     τ₁₁, τ₂₁, τ₁₂, τ₂₂ = τ
 
-    return SSComplexF2(
+    return S²ComplexF2(
         -1/τ₁₁, -τ₂₁/τ₁₁,
         -τ₁₂/τ₁₁, τ₂₂ - τ₂₁*τ₁₂/τ₁₁
     )
 end
 
-τ⁻¹_trans(τ::SSComplexF1) = -1 ./ τ  # SSComplexF1
+τ⁻¹_trans(τ::S²ComplexF1) = -1 ./ τ  # S²ComplexF1

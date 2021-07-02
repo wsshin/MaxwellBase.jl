@@ -24,7 +24,7 @@ end
     ε3temp = zeros(ComplexF64, 3, 3)
     ε3temp[1:2,1:2] .= ε2
     ε3temp[3,3] = rand(ComplexF64)
-    ε3 = MaxwellBase.SSComplexF3(ε3temp)
+    ε3 = MaxwellBase.S²ComplexF3(ε3temp)
 
     τ2 = MaxwellBase.τ_trans(ε2)
     τ3 = MaxwellBase.τ_trans(ε3)

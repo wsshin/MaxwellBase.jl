@@ -32,7 +32,7 @@ end  # @testset "Object"
 #     @test all(map(x->(x==matparam(c_eSi,DUAL)), matparam.(obj_array,DUAL)))
 #
 #     oind2obj = Object{3}[]
-#     pind2matprm = (SSComplexF3[], SSComplexF3[])
+#     pind2matprm = (S²ComplexF3[], S²ComplexF3[])
 #     add_obj!(oind2obj, pind2matprm, obj_array)
 # end  # @testset "periodize"
 

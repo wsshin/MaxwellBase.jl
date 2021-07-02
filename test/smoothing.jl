@@ -28,8 +28,8 @@
     oind2shp = Shape3[]
     oind2εind = ParamInd[]
     oind2μind = ParamInd[]
-    εind2ε = SSComplexF3[]
-    μind2μ = SSComplexF3[]
+    εind2ε = S²ComplexF3[]
+    μind2μ = S²ComplexF3[]
 
     add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
 
@@ -153,8 +153,8 @@ end  # @testset "smoothing, box with odd number of voxels"
     oind2shp = Shape3[]
     oind2εind = ParamInd[]
     oind2μind = ParamInd[]
-    εind2ε = SSComplexF3[]
-    μind2μ = SSComplexF3[]
+    εind2ε = S²ComplexF3[]
+    μind2μ = S²ComplexF3[]
 
     add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
 
@@ -394,7 +394,7 @@ end  # @testset "smoothing, box with even number of voxels"
 #
 #     # Add objects.
 #     ovec = Object{3}[]
-#     paramset = (SSComplexF3[], SSComplexF3[])
+#     paramset = (S²ComplexF3[], S²ComplexF3[])
 #     add_obj!(ovec, paramset, dom_vac, obj_diel)
 #
 #     # Construct arguments and call assign_param!.
