@@ -169,6 +169,20 @@ function create_paramop_supdiag(paramKd::AbsArrComplexF{K₊₂},  # size of las
     return sparse(I, J, V, KfM, KfM)
 end
 
+apply_paramop!(G::AbsArrNumber,  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
+               F::AbsArrNumber,  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
+               G′::AbsArrNumber,  # first temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
+               G′′::AbsArrNumber,  # second temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
+               ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
+               paramKd::AbsArrComplexF,  # material parameter array
+               isfwd_in::AbsVecBool,  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
+               ∆l::NTuple{K,AbsVecNumber},  # line segments to multiply with (defined at field voxel edges); vectors of length N
+               ∆l′⁻¹::NTuple{K,AbsVecNumber},  # line segments to divide by (defined at field voxel corners); vectors of length N
+               isbloch::AbsVecBool,  # for K = 3, boundary conditions in x, y, z
+               e⁻ⁱᵏᴸ::AbsVecNumber=ones{K};  # for K = 3, Bloch phase factor in x, y, z
+               α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
+               ) where {K,OP} =
+apply_paramop!(G, F, G′, G′′, Val(OP), paramKd, SVec{K}(isfwd_in), ∆l, ∆l′⁻¹, SVec{K}(isbloch), SVec{K}(e⁻ⁱᵏᴸ); α)
 
 function apply_paramop!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
                         F::AbsArrNumber{K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
