@@ -1,7 +1,6 @@
 # MaxwellBase
 
-[![Build Status](https://travis-ci.com/wsshin/MaxwellBase.jl.svg?branch=main)](https://travis-ci.com/wsshin/MaxwellBase.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/6yl6i2hnyk9g1cki/branch/main?svg=true)](https://ci.appveyor.com/project/wsshin/maxwellbase-jl/branch/main)
-[![codecov](https://codecov.io/gh/wsshin/MaxwellBase.jl/branch/main/graph/badge.svg?token=AI2W3E87GS)](https://codecov.io/gh/wsshin/MaxwellBase.jl)
+[![CI](https://github.com/wsshin/MaxwellBase.jl/workflows/CI/badge.svg)](https://github.com/wsshin/MaxwellBase.jl/actions)
+[![Codecov](http://codecov.io/github/wsshin/MaxwellBase.jl/coverage.svg?branch=main)](http://codecov.io/github/wsshin/MaxwellBase.jl?branch=main)
 
 **MaxwellBase** is a framework for creating numerical solver packages in Julia for various equations governing electromagnetic phenomena.
