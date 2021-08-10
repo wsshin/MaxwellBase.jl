@@ -51,7 +51,7 @@ max∆l(obj::Object) = obj.∆lmax
 # We return a vector of submatrices rather than a vector of submatrix views, because
 # assign_param!() requires the entries of its argument pind2matprm to be SMatrix rather than
 # views of SMatrix.
-sub_pind2matprm(pind2matprm::AbsVec{<:S²ComplexF{Kₑ,Kₑ²}}, inds::AbsVecInteger) where {Kₑ,Kₑ²} =
+sub_pind2matprm(pind2matprm::AbsVec{<:S²ComplexF{Kf,Kf²}}, inds::AbsVecInteger) where {Kf,Kf²} =
     [SMat{length(inds)}(mp[inds,inds]) for mp = pind2matprm]
 
 # Consider using resize! on oind2obj.
