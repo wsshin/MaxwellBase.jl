@@ -57,6 +57,8 @@ export create_param_array, create_oind_array, assign_param!, assign_val_shape!
 
 # About the material tensors stored as paramKd
 #
+# Keyword argument ncmp is type parameter Kf elsewhere.
+#
 # paramKd[i,j,k,:,:] is a 3×3 tensor for ncmp = 3.  Suppose we are dealing with electric
 # materials. Then this is the ε tensor.  It is important to note that not all the entries of
 # this tensor are measured at the same physical locations.

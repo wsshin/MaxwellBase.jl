@@ -17,7 +17,8 @@ export create_field_array, field_arr2vec, isfield_ortho_shape
 # fixing the component to differentiate first and then perform the differentiation.
 # Therefore, again the E[i,j,k,w] indexing scheme results in an operation on a more
 # contiguous block in memory space.
-
+#
+# Keyword argument ncmp is type parameter Kf elsewhere.
 create_field_array(N::AbsVecInteger; ncmp::Int=3) = create_field_array(SInt{length(N)}(N), ncmp=ncmp)
 create_field_array(N::SInt; ncmp::Int=3) = zeros(ComplexF, N.data..., ncmp)
 
