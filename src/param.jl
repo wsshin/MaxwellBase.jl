@@ -10,6 +10,18 @@ create_paramop(paramKd::AbsArrComplexF,  # material parameter array
                ) where {K} =
     create_paramop(paramKd, SVec{K}(isfwd_in), ∆l, ∆l′⁻¹, SVec{K}(isbloch), SVec{K}(e⁻ⁱᵏᴸ); order_cmpfirst)
 
+# Version for scalar material parameters
+function create_paramop(paramKd::AbsArrComplexF{K₊₂};  # scalar material parameter array
+                        order_cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+                        ) where {K₊₂}
+    K = K₊₂ - 2
+    N = SVec(ntuple(k->size(paramKd,k)-1, Val(K)))  # for -1, see comments about size of paramKd in assignment.jl
+    kdiag = 0
+    paramop = create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)
+
+    return paramop
+end
+
 # Below, N can be retrieved from the size of paramKd or ∆l, but I pass it to make the size
 # more explicit.  This also makes the argument list similar to create_mean()'s, which
 # includes N because it allows omitting ∆l and ∆l′ and using ∆l = ∆l′ = ones.((N...,)) as
@@ -31,74 +43,68 @@ function create_paramop(paramKd::AbsArrComplexF{K₊₂},  # material parameter 
     length.(∆l′⁻¹)==N.data || error("Corresponding entries of ∆l and ∆l′⁻¹ should have same length.")
     M = prod(N)  # number voxels
 
-    if Kf==1  # material parameter is scalar
-        # Averaging operators, which are required for calculating the fields interacting
-        # with off-diagonal entries of the material parameter tensor, are not used because
-        # all entries are on-diagonal.  Therefore, the arguments ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ,
-        # which are used for creating the averaging operators, are unused.
-        kdiag = 0
-        paramop = create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)  # diagonal components of material parameter tensor
-    else  # Kf ≥ 2; material parameter is tensorial
-        # Following Oskooi et al.'s 2009 Optics Letters paper, off-diagonal entries of
-        # material parameter tensors (e.g., ε) are evaluated at the corners of voxels whose
-        # edges are field lines (e.g., E).  Therefore, if w-normal voxel faces are primal
-        # grid planes, the w-component of the input fields need to be averaged in the
-        # backward direction to be interpolated at voxel corners.
-        #
-        # Once these interpolated input fields (e.g., Ex) are multiplied with off-diagonal
-        # entries (e.g., εzx) of the material parameter tensor, we get the output fields
-        # (e.g., Dzx of Dz = Dzx + Dzy + Dzz = εzx Ex + εzy Ey + εzz Ez) in the direction
-        # normal (say v-direction) to the input fields.  These output fields are still at
-        # the voxel corners.  Now, if the v-normal voxel faces are primal grid planes, the
-        # v-component of the output fields need to be averaged in the forward direction to
-        # be interpolated at voxel edges.
-        #
-        # In summary,
-        #
-        # - to obtain the fields to feed to the off-diagonal entries of material parameter
-        # tensors, the w-component of the input fields need to be forward(backward)-averaged
-        # along the w-direction if the w-normal voxel faces are dual (primal) grid planes,
-        #
-        # - to distribute the resulting output fields in the v(≠w)-direction back to voxel
-        # edges, the output fields need to be forward(backward)-averaged along the
-        # v-direction if the v-normal voxel faces are primal (dual) grid planes.
-        #
-        # This means if the w-boundaries are E-field boundaries,
-        # - the input E(H)w-field needs to be backward(forward)-averaged in the w-direction,
-        # - the output E(H)w-field needs to be forward(backward)-averaged in the w-direction.
-        isfwd_out = .!isfwd_in  # SBool{K}; true if output fields need to be backward-averaged
+    # Make sure Kf ≥ 2; the material parameters should be tensorial.
+    Kf==1 && @error "paramKd should represent array of tensorial material parameters"
 
-        # For the output averaging, ∆l and ∆l′ are not supplied to create_mean in order to
-        # create a simple arithmetic averaging operator.  This is because the area factor
-        # matrix multiplied for symmetry to the left of the material parameter matrix
-        # multiplies the same area factor to the two fields being averaged.  (See my notes
-        # on Jul/16/2018 in MaxwellFDFD in Agenda.)
-        Mout = create_mean(isfwd_out, N, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
+    # Following Oskooi et al.'s 2009 Optics Letters paper, off-diagonal entries of
+    # material parameter tensors (e.g., ε) are evaluated at the corners of voxels whose
+    # edges are field lines (e.g., E).  Therefore, if w-normal voxel faces are primal
+    # grid planes, the w-component of the input fields need to be averaged in the
+    # backward direction to be interpolated at voxel corners.
+    #
+    # Once these interpolated input fields (e.g., Ex) are multiplied with off-diagonal
+    # entries (e.g., εzx) of the material parameter tensor, we get the output fields
+    # (e.g., Dzx of Dz = Dzx + Dzy + Dzz = εzx Ex + εzy Ey + εzz Ez) in the direction
+    # normal (say v-direction) to the input fields.  These output fields are still at
+    # the voxel corners.  Now, if the v-normal voxel faces are primal grid planes, the
+    # v-component of the output fields need to be averaged in the forward direction to
+    # be interpolated at voxel edges.
+    #
+    # In summary,
+    #
+    # - to obtain the fields to feed to the off-diagonal entries of material parameter
+    # tensors, the w-component of the input fields need to be forward(backward)-averaged
+    # along the w-direction if the w-normal voxel faces are dual (primal) grid planes,
+    #
+    # - to distribute the resulting output fields in the v(≠w)-direction back to voxel
+    # edges, the output fields need to be forward(backward)-averaged along the
+    # v-direction if the v-normal voxel faces are primal (dual) grid planes.
+    #
+    # This means if the w-boundaries are E-field boundaries,
+    # - the input E(H)w-field needs to be backward(forward)-averaged in the w-direction,
+    # - the output E(H)w-field needs to be forward(backward)-averaged in the w-direction.
+    isfwd_out = .!isfwd_in  # SBool{K}; true if output fields need to be backward-averaged
 
-        # For the input averaging, ∆l and ∆l′ are supplied to create_mean in order to create
-        # a line integral averaging operator.  This is because the inverse of the length
-        # factor matrix multiplied for symmetry to the right of the material parameter
-        # matrix divides the two fields being averaged by different (= nonuniform) line
-        # segments.  The ∆l factors multiplied inside create_minfo cancel the effect of this
-        # multiplication with the nonuniform line segments.  (See my notes on Jul/16/2018 in
-        # MaxwellFDFD in Agenda.)
-        Min = create_mean(isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
+    # For the output averaging, ∆l and ∆l′ are not supplied to create_mean in order to
+    # create a simple arithmetic averaging operator.  This is because the area factor
+    # matrix multiplied for symmetry to the left of the material parameter matrix
+    # multiplies the same area factor to the two fields being averaged.  (See my notes
+    # on Jul/16/2018 in MaxwellFDFD in Agenda.)
+    Mout = create_mean(isfwd_out, N, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
 
-        # Off-diagonal components of material parameter tensor
-        # Min and Mout are block-diagonal matrices, but create_paramop_supdiag() generates
-        # block-off-diagonal matrices for 1 ≤ kdiag ≤ Kf-1.  See my bullet point entitled
-        # [Update (May/13/2018)] in RN - Subpixel Smoothing.
-        kdiag = 1
-        paramop = create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)
-        for kdiag = 2:Kf-1  # index of diagonal of material parameter tensor
-            paramop += create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)
-        end
-        paramop = Mout * paramop * Min
+    # For the input averaging, ∆l and ∆l′ are supplied to create_mean in order to create
+    # a line integral averaging operator.  This is because the inverse of the length
+    # factor matrix multiplied for symmetry to the right of the material parameter
+    # matrix divides the two fields being averaged by different (= nonuniform) line
+    # segments.  The ∆l factors multiplied inside create_minfo cancel the effect of this
+    # multiplication with the nonuniform line segments.  (See my notes on Jul/16/2018 in
+    # MaxwellFDFD in Agenda.)
+    Min = create_mean(isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
 
-        # Diagonal components of material parameter tensor
-        kdiag = 0
-        paramop += create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)  # diagonal components of material parameter tensor
+    # Off-diagonal components of material parameter tensor
+    # Min and Mout are block-diagonal matrices, but create_paramop_supdiag() generates
+    # block-off-diagonal matrices for 1 ≤ kdiag ≤ Kf-1.  See my bullet point entitled
+    # [Update (May/13/2018)] in RN - Subpixel Smoothing.
+    kdiag = 1
+    paramop = create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)
+    for kdiag = 2:Kf-1  # index of diagonal of material parameter tensor
+        paramop += create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)
     end
+    paramop = Mout * paramop * Min
+
+    # Diagonal components of material parameter tensor
+    kdiag = 0
+    paramop += create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)  # diagonal components of material parameter tensor
 
     return paramop
 end
@@ -184,6 +190,20 @@ apply_paramop!(G::AbsArrNumber,  # output field; in 3D, G[i,j,k,w] is w-componen
                ) where {K,OP} =
 apply_paramop!(G, F, G′, G′′, Val(OP), paramKd, SVec{K}(isfwd_in), ∆l, ∆l′⁻¹, SVec{K}(isbloch), SVec{K}(e⁻ⁱᵏᴸ); α)
 
+
+# Version for scalar material parameters
+function apply_paramop!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
+                        F::AbsArrNumber{K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
+                        ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
+                        paramKd::AbsArrComplexF{K₊₂};  # material parameter array
+                        α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
+                        ) where {K₊₁,K₊₂,OP}
+    kdiag = 0
+    apply_paramop_supdiag!(G, F, Val(OP), paramKd, kdiag; α)  # diagonal components of material parameter tensor
+
+    return nothing
+end
+
 function apply_paramop!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
                         F::AbsArrNumber{K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
                         G′::AbsArrNumber{K₊₁},  # first temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
@@ -202,26 +222,24 @@ function apply_paramop!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,
     Kf = size(paramKd, K+1)  # field dimension
     @assert size(paramKd,K+2)==Kf
 
-    if Kf==1  # material parameter is scalar
-        kdiag = 0
-        apply_paramop_supdiag!(G, F, Val(OP), paramKd, kdiag, α=α)  # diagonal components of material parameter tensor
-    else  # Kf ≥ 2; material parameter is tensorial
-        isfwd_out = .!isfwd_in  # SBool{K}; true if output fields need to be backward-averaged
+    # Make sure Kf ≥ 2; the material parameters should be tensorial.
+    Kf==1 && @error "paramKd should represent array of tensorial material parameters"
 
-        apply_mean!(G′, F, Val(:(=)), isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ)
+    isfwd_out = .!isfwd_in  # SBool{K}; true if output fields need to be backward-averaged
 
-        # Off-diagonal components of material parameter tensor
-        kdiag = 1
-        apply_paramop_supdiag!(G′′, G′, Val(:(=)), paramKd, kdiag)
-        for kdiag = 2:Kf-1  # index of diagonal of material parameter tensor
-            apply_paramop_supdiag!(G′′, G′, Val(:(+=)), paramKd, kdiag)
-        end
-        apply_mean!(G, G′′, Val(OP), isfwd_out, isbloch, e⁻ⁱᵏᴸ, α=α)
+    apply_mean!(G′, F, Val(:(=)), isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ)
 
-        # Diagonal components of material parameter tensor
-        kdiag = 0
-        apply_paramop_supdiag!(G, F, Val(:(+=)), paramKd, kdiag, α=α)
+    # Off-diagonal components of material parameter tensor
+    kdiag = 1
+    apply_paramop_supdiag!(G′′, G′, Val(:(=)), paramKd, kdiag)
+    for kdiag = 2:Kf-1  # index of diagonal of material parameter tensor
+        apply_paramop_supdiag!(G′′, G′, Val(:(+=)), paramKd, kdiag)
     end
+    apply_mean!(G, G′′, Val(OP), isfwd_out, isbloch, e⁻ⁱᵏᴸ; α)
+
+    # Diagonal components of material parameter tensor
+    kdiag = 0
+    apply_paramop_supdiag!(G, F, Val(:(+=)), paramKd, kdiag; α)
 
     return nothing
 end
