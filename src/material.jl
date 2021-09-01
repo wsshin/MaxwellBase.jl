@@ -3,19 +3,17 @@ export matparam, kottke_avg_param
 import Base:string
 
 # Note that the output of tensorize is always a matrix: for K = 1, it is a 1×1 matrix.
-tensorize(x::Number, ::Val{K}) where {K} = tensorize(@SVector(fill(complex(x), K)), Val(K))  # SComplexF{3}(x,x,x): vector
-tensorize(v::AbsVecNumber, ::Val{K}) where {K} = diagm(Val(0)=>SComplexF{K}(v))  # complex(v) is allocating, so use SComplexF{K}(v)
-tensorize(m::AbsMatNumber, ::Val{K}) where {K} = S²ComplexF{K,K*K}(m)  # complex(m) is allocating, so use S²ComplexF{K,K*K}(m)
+tensorize(x::Number) = tensorize(@SVector(fill(complex(x), 3)))  # SComplexF{3}(x,x,x): vector
+tensorize(v::AbsVecNumber) = diagm(Val(0)=>SComplexF{3}(v))  # complex(v) is allocating, so use SComplexF{K}(v)
+tensorize(m::AbsMatNumber) = S²ComplexF3(m)  # complex(m) is allocating, so use S²ComplexF{K,K*K}(m)
 
-struct Material{Kₑ,Kₘ,Kₑ²,Kₘ²}  # e: electric, m: magnetic
+struct Material
     name::String
-    param::Tuple{S²ComplexF{Kₑ,Kₑ²},S²ComplexF{Kₘ,Kₘ²}}  # (material parameter interacting with E, material parameter interacting with H)
-    Material{Kₑ,Kₘ,Kₑ²,Kₘ²}(name, param) where {Kₑ,Kₘ,Kₑ²,Kₘ²} =
-        new(name, (tensorize(param[1],Val(Kₑ)), tensorize(param[2],Val(Kₘ))))  # suppress default outer constructor
+    param::Tuple{S²ComplexF3,S²ComplexF3}  # (material parameter interacting with E, and H)
 end
 
-Material{Kₑ,Kₘ}(name::String, param::Tuple2{MatParam}) where {Kₑ,Kₘ} = Material{Kₑ,Kₘ,Kₑ*Kₑ,Kₘ*Kₘ}(name, param)
-Material{Kₑ,Kₘ}(name::String; ε::MatParam=1, μ::MatParam=1) where {Kₑ,Kₘ} = Material{Kₑ,Kₘ}(name, (ε,μ))  # ε, μ: keyword arguments
+Material(name::String, param::Tuple2{MatParam}) = Material(name, tensorize.(param))
+Material(name::String; ε::MatParam=1, μ::MatParam=1) = Material(name, (ε,μ))  # ε, μ: keyword arguments
 # Consider implementing Material2 and Material3 for 2D and 3D solvers.
 
 string(m::Material) = m.name
