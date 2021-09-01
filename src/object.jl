@@ -14,15 +14,15 @@ export shape, matparam, max∆l, sub_pind2matprm, add_obj!, periodize  #, surfpt
 #     surfnormal, surfpoint  # functions
 # import Base:size, getindex, contains, isless, union, intersect
 
-mutable struct Object{K,Kₑ,Kₘ,S<:Shape{K},Kₑ²,Kₘ²}  # K: dimension of space, (Kₑ,Kₘ): dimension of electric and magnetic material parameters
+mutable struct Object{K,S<:Shape{K}}  # K: dimension of space
     shp::S
-    mat::Material{Kₑ,Kₘ,Kₑ²,Kₘ²}
+    mat::Material
     ∆lmax::SVec{K,Float}
-    Object{K,Kₑ,Kₘ,S,Kₑ²,Kₘ²}(shp, mat, ∆lmax) where {K,Kₑ,Kₘ,S,Kₑ²,Kₘ²} = new(shp, mat, ∆lmax)
+    Object{K,S}(shp, mat, ∆lmax) where {K,S} = new(shp, mat, ∆lmax)
 end
 
-Object(shp::S, mat::Material{Kₑ,Kₘ}, ∆lmax::SVec{K}=@SVector(fill(Inf,K))) where {K,Kₑ,Kₘ,S<:Shape{K}} =
-    Object{K,Kₑ,Kₘ,S,Kₑ*Kₑ,Kₘ*Kₘ}(shp, mat, ∆lmax)
+Object(shp::S, mat::Material, ∆lmax::SVec{K}=@SVector(fill(Inf,K))) where {K,S<:Shape{K}} =
+    Object{K,S}(shp, mat, ∆lmax)
 Object(shp::Shape{K}, mat::Material, ∆lmax::AbsVec) where {K} = Object(shp, mat, SVec{K}(∆lmax))
 Object(shp::Shape{K}, mat::Material, ∆lmax::Real) where {K} = Object(shp, mat, SVec(ntuple(k->∆lmax, Val(K))))
 
@@ -51,13 +51,14 @@ max∆l(obj::Object) = obj.∆lmax
 # We return a vector of submatrices rather than a vector of submatrix views, because
 # assign_param!() requires the entries of its argument pind2matprm to be SMatrix rather than
 # views of SMatrix.
-sub_pind2matprm(pind2matprm::AbsVec{<:S²ComplexF{Kf,Kf²}}, inds::SInteger) where {Kf,Kf²} =
+sub_pind2matprm(pind2matprm::AbsVec{S²ComplexF{Kf,Kf²}}, inds::SInteger) where {Kf,Kf²} =
     [mp[inds,inds] for mp = pind2matprm]  # mp[inds,inds]: S²Mat
 
 # Consider using resize! on oind2obj.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
                   pind2matprm::Tuple{AbsVec{S²ComplexF{Kₑ,Kₑ²}},AbsVec{S²ComplexF{Kₘ,Kₘ²}}},
-                  objs::AbsVec{<:Object{K,Kₑ,Kₘ,<:Shape{K,K²},Kₑ²,Kₘ²}}) where {K,Kₑ,Kₘ,K²,Kₑ²,Kₘ²}
+                  objs::AbsVec{Object{K,<:Shape{K,K²}}}
+                  ) where {K,Kₑ,Kₘ,K²,Kₑ²,Kₘ²}
     for obj = objs
         add_obj!(oind2obj, oind2pind, pind2matprm, obj)
     end
@@ -66,7 +67,8 @@ end
 # Consider using resize! on oind2obj.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
                   pind2matprm::Tuple{AbsVec{S²ComplexF{Kₑ,Kₑ²}},AbsVec{S²ComplexF{Kₘ,Kₘ²}}},
-                  objs::Object{K,Kₑ,Kₘ,<:Shape{K,K²},Kₑ²,Kₘ²}...) where {K,Kₑ,Kₘ,K²,Kₑ²,Kₘ²}
+                  objs::Object{K,<:Shape{K,K²}}...
+                  ) where {K,Kₑ,Kₘ,K²,Kₑ²,Kₘ²}
     for obj = objs
         add_obj!(oind2shp, oind2pind, pind2matprm, obj)
     end
@@ -86,8 +88,8 @@ end
 # parameter tensor, then the two objects' materials are assigned with the same pind.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}},  # initially empty vector
                   oind2pind::Tuple2{AbsVec{ParamInd}},  # tuple of initially empty vectors
-                  pind2matprm::Tuple{AbsVec{S²ComplexF{Kₑ,Kₑ²}},AbsVec{S²ComplexF{Kₘ,Kₘ²}}},  # tuple of initially empty vectors
-                  obj::Object{K,Kₑ,Kₘ,<:Shape{K,K²},Kₑ²,Kₘ²}) where {K,Kₑ,Kₘ,K²,Kₑ²,Kₘ²}
+                  pind2matprm::Tuple2{AbsVec{S²ComplexF3}},  # tuple of initially empty vectors
+                  obj::Object{K,<:Shape{K,K²}}) where {K,K²}
     push!(oind2shp, shape(obj))  # append obj (for potential use of oind2obj with KDTree, must use pushfirst! to prepend)
 
     # Assign the material parameter indices to obj.
