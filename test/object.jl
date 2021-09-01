@@ -1,7 +1,7 @@
 @testset "object" begin
 
 @testset "Object" begin
-    mat = Material{3,3}("material", ε=rand(), μ=rand())
+    mat = Material("material", ε=rand(), μ=rand())
 
     @testset "Box" begin
         ba = sort(rand(3,2), dims=2)  # array

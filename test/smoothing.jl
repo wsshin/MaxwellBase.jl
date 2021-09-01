@@ -14,10 +14,10 @@
 
     # Create materials.
     εvac = 1.0
-    vac = Material{3,3}("Vacuum", ε=εvac)
+    vac = Material("Vacuum", ε=εvac)
 
     εdiel = 2.0
-    diel = Material{3,3}("Dielectric", ε=εdiel)
+    diel = Material("Dielectric", ε=εdiel)
 
     # Create objects.
     dom_vac = Object(Box(g3.bounds), vac)
@@ -139,10 +139,10 @@ end  # @testset "smoothing, box with odd number of voxels"
 
     # Create materials.
     εvac = 1.0
-    vac = Material{3,3}("Vacuum", ε=εvac)
+    vac = Material("Vacuum", ε=εvac)
 
     εdiel = 2.0
-    diel = Material{3,3}("Dielectric", ε=εdiel)
+    diel = Material("Dielectric", ε=εdiel)
 
     # Create objects.
     dom_vac = Object(Box(g3.bounds), vac)

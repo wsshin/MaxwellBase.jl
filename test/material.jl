@@ -1,15 +1,15 @@
 @testset "material" begin
 
 @testset "tensorize" begin
-    @test MaxwellBase.tensorize(3, Val(2)) === SMatrix{2,2,ComplexF64,4}(3,0,0,3)
-    @test MaxwellBase.tensorize([2,4], Val(2)) === SMatrix{2,2,ComplexF64,4}(2,0,0,4)
-    @test MaxwellBase.tensorize([1 3; 2 4], Val(2)) === SMatrix{2,2,ComplexF64,4}(1,2,3,4)
+    @test MaxwellBase.tensorize(3) === SMatrix{3,3,ComplexF64,9}(3,0,0, 0,3,0, 0,0,3)
+    @test MaxwellBase.tensorize([2,4,6]) === SMatrix{3,3,ComplexF64,9}(2,0,0, 0,4,0, 0,0,6)
+    @test MaxwellBase.tensorize([1 4 7; 2 5 8; 3 6 9]) === SMatrix{3,3,ComplexF64,9}(1,2,3,4,5,6,7,8,9)
 end
 
 @testset "Material" begin
-    m_nn = Material{3,3}("(num,num)", ε = 2, μ = 3)
-    m_vv = Material{3,3}("(vec,vec)", ε = [2.1,2.2,2.3], μ = [3.1,3.2,3.3])
-    m_mm = Material{3,3}("(mat,mat)", ε = [2 2 2; 2 2 2; 2 2 2], μ = [3 3 3; 3 3 3; 3 3 3])
+    m_nn = Material("(num,num)", ε = 2, μ = 3)
+    m_vv = Material("(vec,vec)", ε = [2.1,2.2,2.3], μ = [3.1,3.2,3.3])
+    m_mm = Material("(mat,mat)", ε = [2 2 2; 2 2 2; 2 2 2], μ = [3 3 3; 3 3 3; 3 3 3])
 
     @test matparam(m_nn,EE) == diagm(0=>[2,2,2]) && matparam(m_nn,HH) == diagm(0=>[3,3,3]) && string(m_nn) == "(num,num)"
     @test matparam(m_vv,EE) == diagm(0=>[2.1,2.2,2.3]) && matparam(m_vv,HH) == diagm(0=>[3.1,3.2,3.3]) && string(m_vv) == "(vec,vec)"
