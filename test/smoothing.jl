@@ -22,7 +22,7 @@
     # Create objects.
     dom_vac = Object(Cuboid(g3.bounds), vac)
     obj_diel = Object(Cuboid([0,0,0], [1,1,1]), diel)
-    # obj_diel = Object(Sphere([0,0,0], 1), diel)
+    # obj_diel = Object(Ball([0,0,0], 1), diel)
 
     # Add objects.
     oind2shp = Shape3[]
@@ -147,7 +147,7 @@ end  # @testset "smoothing, box with odd number of voxels"
     # Create objects.
     dom_vac = Object(Cuboid(g3.bounds), vac)
     obj_diel = Object(Cuboid([0,0,0], [2,2,2]), diel)
-    # obj_diel = Object(Sphere([0,0,0], 1), diel)
+    # obj_diel = Object(Ball([0,0,0], 1), diel)
 
     # Add objects.
     oind2shp = Shape3[]
@@ -390,7 +390,7 @@ end  # @testset "smoothing, box with even number of voxels"
 #     # Create objects.
 #     dom_vac = Object(Cuboid(g3.bounds), vac)
 #     obj_diel = Object(Cuboid([0,0,0], [1,2,1]), diel)
-#     # obj_diel = Object(Sphere([0,0,0], 1), diel)
+#     # obj_diel = Object(Ball([0,0,0], 1), diel)
 #
 #     # Add objects.
 #     ovec = Object{3}[]
