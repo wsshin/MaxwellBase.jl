@@ -56,9 +56,9 @@ sub_pind2matprm(pind2matprm::AbsVec{S²ComplexF{Kf,Kf²}}, inds::SInteger) where
 
 # Consider using resize! on oind2obj.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-                  pind2matprm::Tuple{AbsVec{S²ComplexF{Kₑ,Kₑ²}},AbsVec{S²ComplexF{Kₘ,Kₘ²}}},
+                  pind2matprm::Tuple{AbsVec{S²ComplexF3},AbsVec{S²ComplexF3}},
                   objs::AbsVec{Object{K,<:Shape{K,K²}}}
-                  ) where {K,Kₑ,Kₘ,K²,Kₑ²,Kₘ²}
+                  ) where {K,K²}
     for obj = objs
         add_obj!(oind2obj, oind2pind, pind2matprm, obj)
     end
@@ -66,9 +66,9 @@ end
 
 # Consider using resize! on oind2obj.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-                  pind2matprm::Tuple{AbsVec{S²ComplexF{Kₑ,Kₑ²}},AbsVec{S²ComplexF{Kₘ,Kₘ²}}},
+                  pind2matprm::Tuple{AbsVec{S²ComplexF3},AbsVec{S²ComplexF3}},
                   objs::Object{K,<:Shape{K,K²}}...
-                  ) where {K,Kₑ,Kₘ,K²,Kₑ²,Kₘ²}
+                  ) where {K,K²}
     for obj = objs
         add_obj!(oind2shp, oind2pind, pind2matprm, obj)
     end
