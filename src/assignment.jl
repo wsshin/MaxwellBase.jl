@@ -5,10 +5,10 @@
 # as well, by constructing an 8-vector oid3d_vxl, like pind3d_vxl and oind3d_vxl.
 #
 # The rationale for this trick is that assigning an Int to VecInt is faster than assigning a
-# concrete Object (like Box) to Vector{Object{3}}.  In my test,
+# concrete Object (like Cuboid) to Vector{Object{3}}.  In my test,
 #   setindex!(::VecInt, ::Int, <index>)
 # was about twice as fast as
-#   setindex!(::Vector{Object{3}}, ::Box, <index>), though both took only a few nanoseconds.
+#   setindex!(::Vector{Object{3}}, ::Cuboid, <index>), though both took only a few nanoseconds.
 #
 # Currently the performance of assignment and smoothing seems satisfactory, so I will not
 # pursue this extra optimization.  If I need to assign many objects, the situation may
@@ -410,9 +410,9 @@ function assign_val_shape_impl!(array::AbsArr{T},
     subp = map((l,b) -> (n = findlast(l.≤b); n==nothing ? 0 : n), τlcmp, bp.data)  # NTuple{K,Int}
     CI = CartesianIndices(map((nᵢ,nₑ) -> nᵢ:nₑ, subn, subp))  # CartesianIndices{K}
 
-    # Below, I think using the type assertion in (shape::Box{K,K*K}).p achieves type
-    # stability of p, because Box{K,L}.p is a type of SMatrix{N,N,Float64,L}.
-    if shape isa Box{K,K*K} && (shape::Box{K,K*K}).p == LinearAlgebra.I  # shape is Cartesian box
+    # Below, I think using the type assertion in (shape::Cuboid{K,K*K}).p achieves type
+    # stability of p, because Cuboid{K,L}.p is a type of SMatrix{N,N,Float64,L}.
+    if shape isa Cuboid{K,K*K} && (shape::Cuboid{K,K*K}).p == LinearAlgebra.I  # shape is Cartesian box
         assign_val!(array, val, CI)
     else  # shape is not Cartesian box
         for ci = CI

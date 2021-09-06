@@ -17,8 +17,8 @@
     diel = Material("Dielectric", ε=εdiel)
 
     # Create objects.
-    dom_vac = Object(Box(g3.bounds), vac)
-    obj_diel = Object(Box([0,0,0], [1,1,1]), diel)
+    dom_vac = Object(Cuboid(g3.bounds), vac)
+    obj_diel = Object(Cuboid([0,0,0], [1,1,1]), diel)
     # obj_diel = Object(Sphere([0,0,0], 1), diel)
 
     # Add objects.
@@ -83,8 +83,8 @@ end  # @testset "create_paramop"
     diel = Material("Dielectric", ε=εdiel)
 
     # Create objects.
-    dom_vac = Object(Box(g3.bounds), vac)
-    obj_diel = Object(Box([0,0,0], [1,1,1]), diel)
+    dom_vac = Object(Cuboid(g3.bounds), vac)
+    obj_diel = Object(Cuboid([0,0,0], [1,1,1]), diel)
     # obj_diel = Object(Sphere([0,0,0], 1), diel)
 
     # Add objects.
