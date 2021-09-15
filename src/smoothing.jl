@@ -101,6 +101,9 @@ function smooth_param!(paramKd::AbsArrComplexF{K₊₂},  # parameter array to s
         # Set various arrays for the current component.
         CI = CartesianIndices(length.(lcmp))
         for ci_cmp = CI
+            # Below, ci_1 is always +1 (i.e., not -1 depending on the grid type of field
+            # component), because the field component locations lcmp exclude the ghost
+            # points whereas the voxel corner locations lcmp′ include the ghost points.
             ci_vxl′ = (ci_cmp, ci_cmp + ci_1)  # Tuple2{SInt{3}}
 
             if !is_vxl_uniform!(oind_vxl′, pind_vxl′, ci_vxl′, oind_cmp′, oind2shp, oind2pind)
