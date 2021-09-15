@@ -317,12 +317,13 @@ function smooth_param_vxl(ci_vxl′::Tuple2{CartesianIndex{K}},
             # grid plane, and the above choice of averaging scheme has some theoretical
             # support.
             #
-            # However, now it is no longer possible to deine each field as completely primal
-            # or completely dual.  For example, the Ez-field can be on the primal x-normal
-            # grid plane and dual y-normal grid plane simultaneously.  Therefore, it is no
-            # longer possible to select the averaging scheme based on whether the field is
-            # primal or dual, even if we assume each primal voxel is filled uniformly.
-            # Therefore, we simply perform arithmetic averaging regardless of the field type.
+            # However, now it is no longer possible to define each field as completely
+            # primal or completely dual.  For example, the Ez-field can be on the primal
+            # x-normal grid plane and dual y-normal grid plane simultaneously.  Therefore,
+            # it is no longer possible to select the averaging scheme based on whether the
+            # field is primal or dual, even if we assume each primal voxel is filled
+            # uniformly.  Therefore, we simply perform arithmetic averaging regardless of
+            # the field type.
             prm_vxl = amean_param(obj_cmp′, ci_vxl′, ft)::S²ComplexF{Kf,Kf²}
         else
             # Perform Kottke's subpixel smoothing (defined in material.jl).
