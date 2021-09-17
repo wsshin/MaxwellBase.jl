@@ -327,7 +327,7 @@ function smooth_param_vxl(ci_vxl′::Tuple2{CartesianIndex{K}},
             # field is primal or dual, even if we assume each primal voxel is filled
             # uniformly.  Therefore, we simply perform arithmetic averaging regardless of
             # the field type.
-            prm_vxl = amean_param(obj_cmp′, ci_vxl′, ft)::S²ComplexF{Kf,Kf²}
+            prm_vxl = amean_param(ci_vxl′, oind_cmp′, oind2pind, pind2matprm)::S²ComplexF{Kf,Kf²}
         else
             # Perform Kottke's subpixel smoothing (defined in material.jl).
             prm_vxl = isfield˔shp ? kottke_avg_param(prm_fg, prm_bg, rvol) :  # field is always parallel to shape boundaries
