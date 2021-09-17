@@ -230,109 +230,109 @@ function smooth_param_vxl(ci_vxl′::Tuple2{CartesianIndex{K}},
                           ∆τcmp′::NTuple{K,AbsVecReal},  # amount of shift into domain by Bloch boundary conditions
                           isfield˔shp::Bool=false  # true if spaces where material parameters and shapes are defined are orthogonal complement of each other; false if they are the same
                           ) where {TP,K,K²,Kf,Kf²,Zᴷ}
-        # First, attempt to apply Kottke's subpixel smoothing algorithm.
-        nout = @SVector zeros(K)
-        rvol = 0.0
+    # First, attempt to apply Kottke's subpixel smoothing algorithm.
+    nout = @SVector zeros(K)
+    rvol = 0.0
 
-        with2objs = true  # will be updated, because there could be ≥3 objects in voxel even if Nprm_vxl = 2
-        @inbounds ind_c1, ind_c2 = ind_c[Zᴷ], ind_c[1]::Int  # indices of corners of two different material parameters
-        @inbounds oind_c1, oind_c2 = oind_vxl′[ind_c1], oind_vxl′[ind_c2]
+    with2objs = true  # will be updated, because there could be ≥3 objects in voxel even if Nprm_vxl = 2
+    @inbounds ind_c1, ind_c2 = ind_c[Zᴷ], ind_c[1]::Int  # indices of corners of two different material parameters
+    @inbounds oind_c1, oind_c2 = oind_vxl′[ind_c1], oind_vxl′[ind_c2]
 
-        # The corners ind_c[n_diffp:8] are occupied with one material parameter because
-        # ind_c is sorted for pind_vxl′.  However, those corners can still be occupied with
-        # ≥2 objects.  In that case, the voxel is composed of ≥3 objects.
+    # The corners ind_c[n_diffp:8] are occupied with one material parameter because
+    # ind_c is sorted for pind_vxl′.  However, those corners can still be occupied with
+    # ≥2 objects.  In that case, the voxel is composed of ≥3 objects.
+    #
+    # Note that not having two objects inside the voxel can logically mean having either
+    # one object or ≥3 objects, but because Nprm_vxl ≥ 2, with2objs = false only means
+    # having ≥3 objects inside the voxel.
+    for nc = Zᴷ-1:-1:n_diffp  # n = 2^K-1 corresponds to oind_c1 and is omitted
+        @inbounds (with2objs = oind_vxl′[ind_c[nc]]==oind_c1) || break
+    end
+
+    # At this point, with2objs = false means the corners ind_c[n_diffp:8] are composed
+    # of ≥2 objects.  Then, we already know the voxel has ≥3 objects because the corners
+    # ind_c[1:n_diffp-1] have different materials than the corners ind_c[n_diffp:8]
+    # because Nprm_vxl = 2 and therefore have a different object than those occupying
+    # the corners ind_c[n_diffp:8].  Hence, if with2objs = false at this point, we don't
+    # have to test further if the voxel has ≥3 objects: it already has.
+    if with2objs  # single object for corners ind_c[n_diffp:8]
+        # The corners ind_c[1:n_diffp-1] are occupied with one material parameter
+        # because ind_c is sorted for pind_vxl′, but those corners can still be occupied
+        # with more than one object.  In that case, the voxel is composed of more than
+        # two objects.
+        for nc = 2:n_diffp-1  # n = 1 corresponds oind_c2 and is omitted
+            @inbounds (with2objs = oind_vxl′[ind_c[nc]]==oind_c2) || break
+        end
+    end
+
+    # Find which of ind_c1 and ind_c2 is the index of the corner occupied by the
+    # foreground object.
+    #
+    # When multiple objects have the same object index (because they are essentially the
+    # same object across a periodic boundary), it doesn't matter which object to choose
+    # as the foreground (or background) object, we translate points properly across the
+    # domain (by ∆fg below) in order to evaluate the surface normal direction on the
+    # correct object.  (At least that is the intention, but this needs to be tested
+    # after assigning the same object index is actually implemented.)
+    if oind_c1 > oind_c2  # ind_c1 is foreground corner
+        ind_fg = ind_c1
+        oind_fg, oind_bg = oind_c1, oind_c2
+    else  # ind_c2 is foreground corner
+        @assert oind_c1≠oind_c2
+        ind_fg = ind_c2
+        oind_fg, oind_bg = oind_c2, oind_c1
+    end
+    @inbounds shp_fg, shp_bg = oind2shp[oind_fg], oind2shp[oind_bg]
+    @inbounds prm_fg, prm_bg = pind2matprm[oind2pind[oind_fg]], pind2matprm[oind2pind[oind_bg]]
+
+    # Find
+    # - nout (outward normal of the foreground object), and
+    # - rvol (volume fraction of the foreground object inside the voxel).
+    ci_cmp = ci_vxl′[1]  # CartesianIndex{K}
+    σvxl = t_ind(σcmp, ci_cmp)
+    if !with2objs  # two material parameters but more than two objects in voxel
+        # In this case, the interface between two materials is not defined by the
+        # surface of a single object, so we estimate nout simply from the locations of
+        # the corners occupied by the two materials.
+        nout, rvol = kottke_input_simple(ind_c, n_diffp)::Tuple{SFloat{K},Float}
+    else  # two objects
+        # When Nprm_vxl == Nobj_vxl == 2, different material parameters must correspond
+        # to different objects.
+        x₀ = t_ind(lcmp, ci_cmp)  # SFloat{3}: location of center of smoothing voxel
+        @inbounds lvxl′ = (t_ind(lcmp′,ci_vxl′[1]), t_ind(lcmp′,ci_vxl′[2]))
+
+        @inbounds ci_fg = CartesianIndices(ntuple(x->2,Val(K)))[ind_fg]  # subscritpt of corner ind_fg
+        ci_1 = CartesianIndex(ntuple(x->1, Val(K)))
+        ∆fg = t_ind(∆τcmp′, ci_cmp + ci_fg - ci_1)  # SFloat{3}; nonzero if corner ind_fg is outside periodic boundary
+
+        # See "Overall smoothing algorithm" above.
+        nout, rvol = kottke_input_accurate(x₀, σvxl, lvxl′, ∆fg, shp_fg, shp_bg)::Tuple{SFloat{K},Float}
+    end  # if !with2objs
+
+    if iszero(nout)
+        # Give up Kottke's subpixel smoothing and take simple averaging.
         #
-        # Note that not having two objects inside the voxel can logically mean having either
-        # one object or ≥3 objects, but because Nprm_vxl ≥ 2, with2objs = false only means
-        # having ≥3 objects inside the voxel.
-        for nc = Zᴷ-1:-1:n_diffp  # n = 2^K-1 corresponds to oind_c1 and is omitted
-            @inbounds (with2objs = oind_vxl′[ind_c[nc]]==oind_c1) || break
-        end
-
-        # At this point, with2objs = false means the corners ind_c[n_diffp:8] are composed
-        # of ≥2 objects.  Then, we already know the voxel has ≥3 objects because the corners
-        # ind_c[1:n_diffp-1] have different materials than the corners ind_c[n_diffp:8]
-        # because Nprm_vxl = 2 and therefore have a different object than those occupying
-        # the corners ind_c[n_diffp:8].  Hence, if with2objs = false at this point, we don't
-        # have to test further if the voxel has ≥3 objects: it already has.
-        if with2objs  # single object for corners ind_c[n_diffp:8]
-            # The corners ind_c[1:n_diffp-1] are occupied with one material parameter
-            # because ind_c is sorted for pind_vxl′, but those corners can still be occupied
-            # with more than one object.  In that case, the voxel is composed of more than
-            # two objects.
-            for nc = 2:n_diffp-1  # n = 1 corresponds oind_c2 and is omitted
-                @inbounds (with2objs = oind_vxl′[ind_c[nc]]==oind_c2) || break
-            end
-        end
-
-        # Find which of ind_c1 and ind_c2 is the index of the corner occupied by the
-        # foreground object.
+        # Previously this part was using either arithmetic or harmonic averaging,
+        # depending on whether the field is on a primal or dual grid line.  The
+        # underlying assumption was that the primal voxels were filled uniformly with
+        # a single material, which is a common case when the user puts box-shaped
+        # objects in the domain.  Then, the material interface coincides with a primal
+        # grid plane, and the above choice of averaging scheme has some theoretical
+        # support.
         #
-        # When multiple objects have the same object index (because they are essentially the
-        # same object across a periodic boundary), it doesn't matter which object to choose
-        # as the foreground (or background) object, we translate points properly across the
-        # domain (by ∆fg below) in order to evaluate the surface normal direction on the
-        # correct object.  (At least that is the intention, but this needs to be tested
-        # after assigning the same object index is actually implemented.)
-        if oind_c1 > oind_c2  # ind_c1 is foreground corner
-            ind_fg = ind_c1
-            oind_fg, oind_bg = oind_c1, oind_c2
-        else  # ind_c2 is foreground corner
-            @assert oind_c1≠oind_c2
-            ind_fg = ind_c2
-            oind_fg, oind_bg = oind_c2, oind_c1
-        end
-        @inbounds shp_fg, shp_bg = oind2shp[oind_fg], oind2shp[oind_bg]
-        @inbounds prm_fg, prm_bg = pind2matprm[oind2pind[oind_fg]], pind2matprm[oind2pind[oind_bg]]
-
-        # Find
-        # - nout (outward normal of the foreground object), and
-        # - rvol (volume fraction of the foreground object inside the voxel).
-        ci_cmp = ci_vxl′[1]  # CartesianIndex{K}
-        σvxl = t_ind(σcmp, ci_cmp)
-        if !with2objs  # two material parameters but more than two objects in voxel
-            # In this case, the interface between two materials is not defined by the
-            # surface of a single object, so we estimate nout simply from the locations of
-            # the corners occupied by the two materials.
-            nout, rvol = kottke_input_simple(ind_c, n_diffp)::Tuple{SFloat{K},Float}
-        else  # two objects
-            # When Nprm_vxl == Nobj_vxl == 2, different material parameters must correspond
-            # to different objects.
-            x₀ = t_ind(lcmp, ci_cmp)  # SFloat{3}: location of center of smoothing voxel
-            @inbounds lvxl′ = (t_ind(lcmp′,ci_vxl′[1]), t_ind(lcmp′,ci_vxl′[2]))
-
-            @inbounds ci_fg = CartesianIndices(ntuple(x->2,Val(K)))[ind_fg]  # subscritpt of corner ind_fg
-            ci_1 = CartesianIndex(ntuple(x->1, Val(K)))
-            ∆fg = t_ind(∆τcmp′, ci_cmp + ci_fg - ci_1)  # SFloat{3}; nonzero if corner ind_fg is outside periodic boundary
-
-            # See "Overall smoothing algorithm" above.
-            nout, rvol = kottke_input_accurate(x₀, σvxl, lvxl′, ∆fg, shp_fg, shp_bg)::Tuple{SFloat{K},Float}
-        end  # if !with2objs
-
-        if iszero(nout)
-            # Give up Kottke's subpixel smoothing and take simple averaging.
-            #
-            # Previously this part was using either arithmetic or harmonic averaging,
-            # depending on whether the field is on a primal or dual grid line.  The
-            # underlying assumption was that the primal voxels were filled uniformly with
-            # a single material, which is a common case when the user puts box-shaped
-            # objects in the domain.  Then, the material interface coincides with a primal
-            # grid plane, and the above choice of averaging scheme has some theoretical
-            # support.
-            #
-            # However, now it is no longer possible to define each field as completely
-            # primal or completely dual.  For example, the Ez-field can be on the primal
-            # x-normal grid plane and dual y-normal grid plane simultaneously.  Therefore,
-            # it is no longer possible to select the averaging scheme based on whether the
-            # field is primal or dual, even if we assume each primal voxel is filled
-            # uniformly.  Therefore, we simply perform arithmetic averaging regardless of
-            # the field type.
-            prm_vxl = amean_param(ci_vxl′, oind_cmp′, oind2pind, pind2matprm)::S²ComplexF{Kf,Kf²}
-        else
-            # Perform Kottke's subpixel smoothing (defined in material.jl).
-            prm_vxl = isfield˔shp ? kottke_avg_param(prm_fg, prm_bg, rvol) :  # field is always parallel to shape boundaries
-                                    kottke_avg_param(prm_fg, prm_bg, nout, rvol)
-        end
+        # However, now it is no longer possible to define each field as completely
+        # primal or completely dual.  For example, the Ez-field can be on the primal
+        # x-normal grid plane and dual y-normal grid plane simultaneously.  Therefore,
+        # it is no longer possible to select the averaging scheme based on whether the
+        # field is primal or dual, even if we assume each primal voxel is filled
+        # uniformly.  Therefore, we simply perform arithmetic averaging regardless of
+        # the field type.
+        prm_vxl = amean_param(ci_vxl′, oind_cmp′, oind2pind, pind2matprm)::S²ComplexF{Kf,Kf²}
+    else
+        # Perform Kottke's subpixel smoothing (defined in material.jl).
+        prm_vxl = isfield˔shp ? kottke_avg_param(prm_fg, prm_bg, rvol) :  # field is always parallel to shape boundaries
+                                kottke_avg_param(prm_fg, prm_bg, nout, rvol)
+    end
 
     return prm_vxl
 end
