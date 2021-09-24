@@ -26,9 +26,6 @@ Object(shp::S, mat::Material, ∆lmax::SVec{K}=@SVector(fill(Inf,K))) where {K,S
 Object(shp::Shape{K}, mat::Material, ∆lmax::AbsVec) where {K} = Object(shp, mat, SVec{K}(∆lmax))
 Object(shp::Shape{K}, mat::Material, ∆lmax::Real) where {K} = Object(shp, mat, SVec(ntuple(k->∆lmax, Val(K))))
 
-# Add a new convenience constructor
-GeometryPrimitives.Cuboid(b::Tuple2{AbsVec}, axes=Matrix{Float}(I,length(b[1]),length(b[1]))) = Cuboid((b[1]+b[2])/2, abs.(b[2]-b[1]), axes)
-
 # Create the user interface such that maxwellsys.add(shape, material, ∆lmax) uses this function.
 # setmat!(obj::Object, m::Material) = (obj.mat = m; obj)
 # setmax∆l!(obj::Object{K}, ∆lmax::AbsVec) where {K} = (obj.∆lmax = SVec{K}(∆lmax); obj)
