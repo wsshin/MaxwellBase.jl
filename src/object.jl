@@ -8,7 +8,7 @@
 # bounds, then only this is exported.  So, when defining bounds for Interval, we have to
 # "extend" bounds for Shape by defining it as GeometryPrimitives.bounds(::Interval) = ....
 # Then, exporting bounds exports this whole collection of bounds, both for Shape and Interval.
-export OpenInterval, ClosedInterval, KDTree, Object
+export Object
 export shape, matparam, max∆l, sub_pind2matprm, add_obj!, periodize  #, surfpt_nearby, normal
 # export lsf, bound_, L_, center_, dist2bound, bound_contains, ∆lmax, sphere, transform,
 #     surfnormal, surfpoint  # functions
