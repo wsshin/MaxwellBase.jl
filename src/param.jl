@@ -256,11 +256,11 @@ function apply_paramop_supdiag!(G::AbsArrNumber{4},  # output field; G[i,j,k,w] 
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
     for nv = 1:Kf  # row index of material parameter tensor
-        Gv = @view G[:,:,:,nv]
+        Gᵥ = @view G[:,:,:,nv]
         nw = mod1(nv+kdiag, Kf)  # column index of material parameter tensor
         @threads for k = 1:Nz
             for j = 1:Ny, i = 1:Nx
-                @inbounds set_or_add!(Gv, (i,j,k), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
+                @inbounds set_or_add!(Gᵥ, (i,j,k), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
                 # @inbounds set_or_add!(G, (i,j,k,nv), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
             end
         end
@@ -281,11 +281,11 @@ function apply_paramop_supdiag!(G::AbsArrNumber{3},  # output field; G[i,j,w] is
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
     for nv = 1:Kf  # row index of material parameter tensor
-        Gv = @view G[:,:,nv]
+        Gᵥ = @view G[:,:,nv]
         nw = mod1(nv+kdiag, Kf)  # column index of material parameter tensor
         @threads for j = 1:Ny
             for i = 1:Nx
-                @inbounds set_or_add!(Gv, (i,j), paramKd[i,j,nv,nw] * F[i,j,nw], Val(OP))
+                @inbounds set_or_add!(Gᵥ, (i,j), paramKd[i,j,nv,nw] * F[i,j,nw], Val(OP))
                 # @inbounds set_or_add!(G, (i,j,k,nv), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
             end
         end
@@ -306,11 +306,11 @@ function apply_paramop_supdiag!(G::AbsArrNumber{2},  # output field; G[i,w] is w
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
     for nv = 1:Kf  # row index of material parameter tensor
-        Gv = @view G[:,:,nv]
+        Gᵥ = @view G[:,:,nv]
         nw = mod1(nv+kdiag, Kf)  # column index of material parameter tensor
         @threads for j = 1:Ny
             for i = 1:Nx
-                @inbounds set_or_add!(Gv, (i,j), paramKd[i,j,nv,nw] * F[i,j,nw], Val(OP))
+                @inbounds set_or_add!(Gᵥ, (i,j), paramKd[i,j,nv,nw] * F[i,j,nw], Val(OP))
                 # @inbounds set_or_add!(G, (i,j,k,nv), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
             end
         end
