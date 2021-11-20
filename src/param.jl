@@ -179,27 +179,27 @@ apply_paramop!(G::AbsArrNumber,  # output field; in 3D, G[i,j,k,w] is w-componen
                F::AbsArrNumber,  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
                G′::AbsArrNumber,  # first temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
                G′′::AbsArrNumber,  # second temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
-               ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
                paramKd::AbsArrComplexF,  # material parameter array
                isfwd_in::AbsVecBool,  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
                ∆l::NTuple{K,AbsVecNumber},  # line segments to multiply with (defined at field voxel edges); vectors of length N
                ∆l′⁻¹::NTuple{K,AbsVecNumber},  # line segments to divide by (defined at field voxel corners); vectors of length N
                isbloch::AbsVecBool,  # for K = 3, boundary conditions in x, y, z
                e⁻ⁱᵏᴸ::AbsVecNumber=ones{K};  # for K = 3, Bloch phase factor in x, y, z
-               α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
-               ) where {K,OP} =
-apply_paramop!(G, F, G′, G′′, Val(OP), paramKd, SVec{K}(isfwd_in), ∆l, ∆l′⁻¹, SVec{K}(isbloch), SVec{K}(e⁻ⁱᵏᴸ); α)
+               α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+               overwrite::Bool=true  # false to add result to output storage G
+               ) where {K} =
+apply_paramop!(G, F, G′, G′′, paramKd, SVec{K}(isfwd_in), ∆l, ∆l′⁻¹, SVec{K}(isbloch), SVec{K}(e⁻ⁱᵏᴸ); α, overwrite)
 
 
 # Version for scalar material parameters
 function apply_paramop!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
                         F::AbsArrNumber{K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
-                        ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
                         paramKd::AbsArrComplexF{K₊₂};  # material parameter array
-                        α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
-                        ) where {K₊₁,K₊₂,OP}
+                        α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+                        overwrite::Bool=true  # false to add result to output storage G
+                        ) where {K₊₁,K₊₂}
     kdiag = 0
-    apply_paramop_supdiag!(G, F, Val(OP), paramKd, kdiag; α)  # diagonal components of material parameter tensor
+    apply_paramop_supdiag!(G, F, paramKd, kdiag; α, overwrite)  # diagonal components of material parameter tensor
 
     return nothing
 end
@@ -208,15 +208,15 @@ function apply_paramop!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,
                         F::AbsArrNumber{K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
                         G′::AbsArrNumber{K₊₁},  # first temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
                         G′′::AbsArrNumber{K₊₁},  # second temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
-                        ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
                         paramKd::AbsArrComplexF{K₊₂},  # material parameter array
                         isfwd_in::SBool{K},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
                         ∆l::NTuple{K,AbsVecNumber},  # line segments to multiply with (defined at field voxel edges); vectors of length N
                         ∆l′⁻¹::NTuple{K,AbsVecNumber},  # line segments to divide by (defined at field voxel corners); vectors of length N
                         isbloch::SBool{K},  # for K = 3, boundary conditions in x, y, z
                         e⁻ⁱᵏᴸ::SNumber{K};  # for K = 3, Bloch phase factor in x, y, z
-                        α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
-                        ) where {K,K₊₁,K₊₂,OP}
+                        α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+                        overwrite::Bool=true  # false to add result to output storage G
+                        ) where {K,K₊₁,K₊₂}
     @assert K₊₁==K+1 && K₊₂==K+2
 
     Kf = size(paramKd, K+1)  # field dimension
@@ -227,19 +227,19 @@ function apply_paramop!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,
 
     isfwd_out = .!isfwd_in  # SBool{K}; true if output fields need to be backward-averaged
 
-    apply_mean!(G′, F, Val(:(=)), isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ)
+    apply_mean!(G′, F, isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ)
 
     # Off-diagonal components of material parameter tensor
     kdiag = 1
-    apply_paramop_supdiag!(G′′, G′, Val(:(=)), paramKd, kdiag)
+    apply_paramop_supdiag!(G′′, G′, paramKd, kdiag)
     for kdiag = 2:Kf-1  # index of diagonal of material parameter tensor
-        apply_paramop_supdiag!(G′′, G′, Val(:(+=)), paramKd, kdiag)
+        apply_paramop_supdiag!(G′′, G′, paramKd, kdiag, overwrite=false)
     end
-    apply_mean!(G, G′′, Val(OP), isfwd_out, isbloch, e⁻ⁱᵏᴸ; α)
+    apply_mean!(G, G′′, isfwd_out, isbloch, e⁻ⁱᵏᴸ; α, overwrite)
 
     # Diagonal components of material parameter tensor
     kdiag = 0
-    apply_paramop_supdiag!(G, F, Val(:(+=)), paramKd, kdiag; α)
+    apply_paramop_supdiag!(G, F, paramKd, kdiag; α, overwrite=false)
 
     return nothing
 end
@@ -247,21 +247,20 @@ end
 # 3D
 function apply_paramop_supdiag!(G::AbsArrNumber{4},  # output field; G[i,j,k,w] is w-component of G at (i,j,k)
                                 F::AbsArrNumber{4},  # input field; F[i,j,k,w] is w-component of F at (i,j,k)
-                                ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
                                 paramKd::AbsArrComplexF{5},  # size of last two dimensions is Kf-by-Kf
                                 kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
-                                α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
-                                ) where {OP}
+                                α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+                                overwrite::Bool=true)  # false to add result to output storage G
     Nx, Ny, Nz, Kf = size(G)  # Kf: field dimension
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
+    overwrite && (G .= 0)
     for nv = 1:Kf  # row index of material parameter tensor
         Gᵥ = @view G[:,:,:,nv]
         nw = mod1(nv+kdiag, Kf)  # column index of material parameter tensor
         @threads for k = 1:Nz
             for j = 1:Ny, i = 1:Nx
-                @inbounds set_or_add!(Gᵥ, (i,j,k), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
-                # @inbounds set_or_add!(G, (i,j,k,nv), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
+                @inbounds Gᵥ[i,j,k] += paramKd[i,j,k,nv,nw] * F[i,j,k,nw]
             end
         end
     end
@@ -272,21 +271,20 @@ end
 # 2D
 function apply_paramop_supdiag!(G::AbsArrNumber{3},  # output field; G[i,j,w] is w-component of G at (i,j)
                                 F::AbsArrNumber{3},  # input field; F[i,j,w] is w-component of F at (i,j)
-                                ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
                                 paramKd::AbsArrComplexF{4},  # size of last two dimensions is Kf-by-Kf
                                 kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
-                                α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
-                                ) where {OP}
+                                α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+                                overwrite::Bool=true)  # false to add result to output storage G
     Nx, Ny, Kf = size(G)  # Kf: field dimension
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
+    overwrite && (G .= 0)
     for nv = 1:Kf  # row index of material parameter tensor
         Gᵥ = @view G[:,:,nv]
         nw = mod1(nv+kdiag, Kf)  # column index of material parameter tensor
         @threads for j = 1:Ny
             for i = 1:Nx
-                @inbounds set_or_add!(Gᵥ, (i,j), paramKd[i,j,nv,nw] * F[i,j,nw], Val(OP))
-                # @inbounds set_or_add!(G, (i,j,k,nv), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
+                @inbounds Gᵥ[i,j] += paramKd[i,j,nv,nw] * F[i,j,nw]
             end
         end
     end
@@ -297,21 +295,20 @@ end
 # 1D
 function apply_paramop_supdiag!(G::AbsArrNumber{2},  # output field; G[i,w] is w-component of G at (i,)
                                 F::AbsArrNumber{2},  # input field; F[i,w] is w-component of F at (i,)
-                                ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
                                 paramKd::AbsArrComplexF{3},  # size of last two dimensions is Kf-by-Kf
                                 kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
-                                α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
-                                ) where {OP}
+                                α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+                                overwrite::Bool=true)  # false to add result to output storage G
     Nx, Kf = size(G)  # Kf: field dimension
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
+    overwrite && (G .= 0)
     for nv = 1:Kf  # row index of material parameter tensor
         Gᵥ = @view G[:,:,nv]
         nw = mod1(nv+kdiag, Kf)  # column index of material parameter tensor
         @threads for j = 1:Ny
             for i = 1:Nx
-                @inbounds set_or_add!(Gᵥ, (i,j), paramKd[i,j,nv,nw] * F[i,j,nw], Val(OP))
-                # @inbounds set_or_add!(G, (i,j,k,nv), paramKd[i,j,k,nv,nw] * F[i,j,k,nw], Val(OP))
+                @inbounds Gᵥ[i,j] += paramKd[i,j,nv,nw] * F[i,j,nw]
             end
         end
     end
@@ -321,22 +318,22 @@ end
 
 # function apply_paramop_supdiag!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
 #                                 F::AbsArrNumber{K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
-#                                 ::Val{OP},  # Val(:(=)) or Val(:(+=)): set (=) or add (+=) operator to use
 #                                 paramKd::AbsArrComplexF{K₊₂},  # size of last two dimensions is Kf-by-Kf
 #                                 kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
 #                                 α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
-#                                 ) where {K₊₁,K₊₂,OP}
+#                                 overwrite::Bool=true)  # false to add result to output storage G
 #     K = K₊₁ - 1
 #     @assert K₊₂==K+2
 #
 #     Kf = size(paramKd, K+1)  # field dimension
 #     @assert size(paramKd,K+2)==Kf
 #
+#     overwrite && (G .= 0)
 #     CI = CartesianIndices(size(G)[1:K])
 #     for nv = 1:Kf  # row index of material parameter tensor
 #         nw = mod1(nv+kdiag, Kf)  # column index of material parameter tensor
 #         for ci = CI
-#             @inbounds G[ci,nv] = paramKd[ci,nv,nw] * F[ci,nw]
+#             @inbounds G[ci,nv] += paramKd[ci,nv,nw] * F[ci,nw]
 #         end
 #     end
 #
