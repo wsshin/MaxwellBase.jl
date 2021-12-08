@@ -1,3 +1,4 @@
+export create_∆ls
 # import Base:isapprox, dot
 
 # See http://stackoverflow.com/questions/2786899/fastest-sort-of-fixed-length-6-int-array.
@@ -54,3 +55,18 @@ end
 isuniform(mv::MArray{Tuple{2,2,2},<:Any,3,8}) = @inbounds (mv[1]==mv[2]==mv[3]==mv[4]==mv[5]==mv[6]==mv[7]==mv[8])
 isuniform(mv::MArray{Tuple{2,2},<:Any,2,4}) = @inbounds (mv[1]==mv[2]==mv[3]==mv[4])
 isuniform(mv::MArray{Tuple{2},<:Any,1,2}) = @inbounds (mv[1]==mv[2])
+
+function create_∆ls(grid::Grid{K}, boundft::SVec{K,FieldType}) where {K}
+    ∆l = grid.∆l
+    ∆l⁻¹ = invert_∆l(∆l)
+
+    gₑ = ft2gt.(EE, boundft)
+    gₘ = ft2gt.(HH, boundft)
+
+    ∆lₑ = t_ind(∆l, gₑ)  # ∆l's centered at E-field plane locations
+    ∆lₘ = t_ind(∆l, gₘ)  # ∆l's centered at H-field plane locations
+    ∆lₑ⁻¹ = t_ind(∆l⁻¹, gₑ)
+    ∆lₘ⁻¹ = t_ind(∆l⁻¹, gₘ)
+
+    return ∆lₑ, ∆lₘ, ∆lₑ⁻¹, ∆lₘ⁻¹
+end
