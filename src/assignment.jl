@@ -399,16 +399,30 @@ function assign_val_shape_impl!(array::AbsArr{T},
                                 τlcmp::NTuple{K,AbsVecReal}) where {T,K,Kf}
     # Set the location indices of object boundaries.
     @assert all(issorted.(τlcmp))
-    bn, bp = bounds(shape)  # (SVec{K}, SVec{K})
+    bₙ, bₚ = bounds(shape)  # (SVec{K}, SVec{K})
 
     # Below, if shape is beyond the positive end of the domain, then findlast(l.≤b) = length(l)
     # but findfirst(l.≥b) = nothing.  To prevent any assignment, we have to replace nothing
     # with length(l)+1.  Then, the index range becomes length(l)+1:length(l), over which no
     # iteration occurs.  Similar consideration for shape beyond the negative end of the
     # domain.
-    subn = map((l,b) -> (n = findfirst(l.≥b); n==nothing ? length(l)+1 : n), τlcmp, bn.data)  # NTuple{K,Int}
-    subp = map((l,b) -> (n = findlast(l.≤b); n==nothing ? 0 : n), τlcmp, bp.data)  # NTuple{K,Int}
-    CI = CartesianIndices(map((nᵢ,nₑ) -> nᵢ:nₑ, subn, subp))  # CartesianIndices{K}
+
+    # The code below is less-compact, but less-allocating version of the following code:
+    #     subn = map((l,b) -> (n = findfirst(l.≥b); n==nothing ? length(l)+1 : n), τlcmp, bn.data)  # NTuple{K,Int}
+    #     subp = map((l,b) -> (n = findlast(l.≤b); n==nothing ? 0 : n), τlcmp, bp.data)  # NTuple{K,Int}
+    #     CI = CartesianIndices(map((nᵢ,nₑ) -> nᵢ:nₑ, subn, subp))  # CartesianIndices{K}
+    sub_rng = MVec{K,UnitRange{Int64}}(undef)
+    for k = 1:K
+        lₖ = τlcmp[k]
+        bₙₖ = bₙ[k]
+        bₚₖ = bₚ[k]
+
+        subₙ = lₖ[end]<bₙₖ ? length(lₖ)+1 : findfirst(w -> w≥bₙₖ, lₖ)
+        subₚ = lₖ[1]>bₚₖ ? 0 : findlast(w -> w≤bₚₖ, lₖ)
+
+        sub_rng[k] = subₙ:subₚ
+    end
+    CI = CartesianIndices(sub_rng.data)  # CartesianIndices{K}
 
     # Below, I think using the type assertion in (shape::Cuboid{K,K*K}).p achieves type
     # stability of p, because Cuboid{K,L}.p is a type of SMatrix{N,N,Float64,L}.
