@@ -18,8 +18,8 @@ end  # @testset "Object"
 # @testset "periodize" begin
 #     # Square lattice
 #     Si = Material("Si", ε = 12)
-#     gₑ = PRIM
-#     eSi = EncodedMaterial(gₑ, Si)
+#     gtₑ = PRIM
+#     eSi = EncodedMaterial(gtₑ, Si)
 #     c_eSi = Object(Cylinder([0,0,0], 1, 5, [0,0,1]), eSi)
 #
 #     b = Cuboid([0,0,0], [10,10,5])
