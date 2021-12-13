@@ -7,6 +7,7 @@ using Reexport
 @reexport using LinearAlgebra, SparseArrays, StaggeredGridCalculus, GeometryPrimitives
 using AbbreviatedTypes
 using SimpleConstants
+using CSV, Downloads, DataFrames, Dierckx  # used in material.jl/read_nk()
 using Base.Threads: @threads  # used in param.jl
 
 export S²ComplexF1, S²ComplexF2, S²ComplexF3, MatParam, ParamInd, ObjInd
