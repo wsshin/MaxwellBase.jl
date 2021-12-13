@@ -23,7 +23,7 @@ create_field_array(N::AbsVecInteger; ncmp::Int=3) = create_field_array(SInt{leng
 create_field_array(N::SInt; ncmp::Int=3) = zeros(ComplexF, N.data..., ncmp)
 
 
-# Create a vector view of the field array.
+# Create a vector version of the field array.
 #
 # Note that reshape(A, :) creates a vector that shares the memory with A, i.e., if the
 # entries of the resulting vector change, the corresponding entries of A change as well.
@@ -36,8 +36,8 @@ create_field_array(N::SInt; ncmp::Int=3) = zeros(ComplexF, N.data..., ncmp)
 # to save memory.  However, it turns out that such an implementation returns a vector that
 # is slow on GPU.
 function field_arr2vec(fKd::AbsArrNumber{K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
-              order_cmpfirst::Bool=true
-              ) where {K₊₁}
+                       order_cmpfirst::Bool=true
+                       ) where {K₊₁}
     p = order_cmpfirst ? (K₊₁, ntuple(identity,Val(K₊₁-1))...) : ntuple(identity,Val(K₊₁))
 
     return reshape(permutedims(fKd,p), :)
