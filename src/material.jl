@@ -5,7 +5,7 @@ import Base:string
 # Assume the file has λ and n as columns, and additionally k.
 function read_nk(uri::String,  # location of CSV file containing λ, n, and possibly k columns
                  λunit::Real;  # unit of λ values
-                 bc="nearest",  # boundary condition to use in Dierckx: "nearest", "zero", "extrapolate", "error"
+                 bc="extrapolate",  # boundary condition to use in Dierckx: "nearest", "zero", "extrapolate", "error"
                  kwargs...)  # keyword arguments for CSV.read
     #
     if splitpath(uri)[1]=="https:"
