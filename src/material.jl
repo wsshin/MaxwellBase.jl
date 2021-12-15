@@ -5,6 +5,7 @@ import Base:string
 # Assume the file has λ and n as columns, and additionally k.
 function read_nk(uri::String,  # location of CSV file containing λ, n, and possibly k columns
                  λunit::Real;  # unit of λ values
+                 deg=3,  # degree of spline (default: cubic)
                  bc="extrapolate",  # boundary condition to use in Dierckx: "nearest", "zero", "extrapolate", "error"
                  kwargs...)  # keyword arguments for CSV.read
     #
@@ -19,8 +20,8 @@ function read_nk(uri::String,  # location of CSV file containing λ, n, and poss
     n = df[:,2]
     k = ncol==3 ? df[:,3] : zeros(nrow)
 
-    n_fun = Spline1D(λ, n; bc)
-    k_fun = Spline1D(λ, k; bc)
+    n_fun = Spline1D(λ, n; bc, k=deg)
+    k_fun = Spline1D(λ, k; bc, k=deg)
 
     return (n=n_fun, k=k_fun)
 end
