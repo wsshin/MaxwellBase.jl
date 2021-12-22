@@ -1,6 +1,5 @@
 export Material
 export matparam, kottke_avg_param
-import Base:string
 
 # Note that the output of tensorize is always a matrix: for K = 1, it is a 1×1 matrix.
 tensorize(x::Number) = tensorize(@SVector(fill(complex(x), 3)))  # SComplexF{3}(x,x,x): vector
@@ -16,7 +15,7 @@ Material(name::String, param::Tuple2{MatParam}) = Material(name, tensorize.(para
 Material(name::String; ε::MatParam=1, μ::MatParam=1) = Material(name, (ε,μ))  # ε, μ: keyword arguments
 # Consider implementing Material2 and Material3 for 2D and 3D solvers.
 
-string(m::Material) = m.name
+Base.string(m::Material) = m.name
 matparam(m::Material, ft::FieldType) = m.param[Int(ft)]
 
 kottke_avg_param(param1::AbsMatNumber, param2::AbsMatNumber, n12::AbsVecReal, rvol1::Real) =
