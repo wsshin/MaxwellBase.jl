@@ -1,30 +1,6 @@
 export Material
-export read_nk, matparam, kottke_avg_param
+export matparam, kottke_avg_param
 import Base:string
-
-# Assume the file has λ and n as columns, and additionally k.
-function read_nk(uri::String,  # location of CSV file containing λ, n, and possibly k columns
-                 λunit::Real;  # unit of λ values
-                 deg=3,  # degree of spline (default: cubic)
-                 bc="extrapolate",  # boundary condition to use in Dierckx: "nearest", "zero", "extrapolate", "error"
-                 kwargs...)  # keyword arguments for CSV.read
-    #
-    if splitpath(uri)[1]=="https:"
-        df = CSV.read(Downloads.download(uri), DataFrame; kwargs...)
-    else
-        df = CSV.read(uri, DataFrame; kwargs...)
-    end
-
-    nrow, ncol = size(df)
-    λ = df[:,1] .* λunit
-    n = df[:,2]
-    k = ncol==3 ? df[:,3] : zeros(nrow)
-
-    n_fun = Spline1D(λ, n; bc, k=deg)
-    k_fun = Spline1D(λ, k; bc, k=deg)
-
-    return (n=n_fun, k=k_fun)
-end
 
 # Note that the output of tensorize is always a matrix: for K = 1, it is a 1×1 matrix.
 tensorize(x::Number) = tensorize(@SVector(fill(complex(x), 3)))  # SComplexF{3}(x,x,x): vector

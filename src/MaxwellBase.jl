@@ -5,7 +5,6 @@ module MaxwellBase
 # automatically upon calling `using MaxwellBase`.
 using Reexport
 @reexport using LinearAlgebra, SparseArrays, StaggeredGridCalculus, GeometryPrimitives
-using CSV, Downloads, DataFrames, Dierckx  # used in material.jl/read_nk()
 using Base.Threads: @threads  # used in param.jl
 using AbbreviatedTypes
 using SimpleConstants
