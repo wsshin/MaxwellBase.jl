@@ -68,5 +68,5 @@ function create_∆ls(grid::Grid{K}, boundft::SVec{K,FieldType}) where {K}
     ∆lₑ⁻¹ = t_ind(∆l⁻¹, gtₑ)
     ∆lₘ⁻¹ = t_ind(∆l⁻¹, gtₘ)
 
-    return ∆lₑ, ∆lₘ, ∆lₑ⁻¹, ∆lₘ⁻¹
+    return (∆lₑ, ∆lₘ), (∆lₑ⁻¹, ∆lₘ⁻¹)
 end
