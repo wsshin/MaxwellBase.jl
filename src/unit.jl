@@ -27,7 +27,7 @@ struct MaxwellUnit
 
     function MaxwellUnit(L₀::Real)
         # The length unit L₀ is set by users.
-        L₀ > 0 || throw(ArgumentError("L₀ = $L₀ must be positive."));
+        @argcheck L₀ > 0  # L₀ must be positive
 
         # The E-field unit is arbitrarily chosen as E₀ = 1 V/m.
         E₀ = 1.0  # E-field is measured in V/m

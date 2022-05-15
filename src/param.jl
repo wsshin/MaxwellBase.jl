@@ -40,11 +40,11 @@ function create_paramop(paramKd::AbsArrComplexF{K₊₂},  # material parameter 
     @assert size(paramKd,K+2)==Kf
 
     N = SVec(length.(∆l))
-    length.(∆l′⁻¹)==N.data || error("Corresponding entries of ∆l and ∆l′⁻¹ should have same length.")
+    @argcheck length.(∆l′⁻¹)==N.data  # corresponding entries of ∆l and ∆l′⁻¹ should have same length
     M = prod(N)  # number voxels
 
     # Make sure Kf ≥ 2; the material parameters should be tensorial.
-    Kf==1 && @error "paramKd should represent array of tensorial material parameters"
+    @argcheck Kf≥2  # paramKd should represent array of tensorial material parameters
 
     # Following Oskooi et al.'s 2009 Optics Letters paper, off-diagonal entries of
     # material parameter tensors (e.g., ε) are evaluated at the corners of voxels whose
@@ -223,7 +223,7 @@ function apply_paramop!(G::AbsArrNumber{K₊₁},  # output field; in 3D, G[i,j,
     @assert size(paramKd,K+2)==Kf
 
     # Make sure Kf ≥ 2; the material parameters should be tensorial.
-    Kf==1 && @error "paramKd should represent array of tensorial material parameters"
+    @argcheck Kf≥2  # paramKd should represent array of tensorial material parameters
 
     isfwd_out = .!isfwd_in  # SBool{K}; true if output fields need to be backward-averaged
 

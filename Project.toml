@@ -7,6 +7,7 @@ version = "0.1.16"
 
 [deps]
 AbbreviatedTypes = "1766def0-c946-4dda-a59e-d0d07f8410f7"
+ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
 GeometryPrimitives = "17051e67-205e-509e-8301-03b320b998e6"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
@@ -16,6 +17,7 @@ StaggeredGridCalculus = "fead5d43-7759-5ac8-9dff-97135399d9eb"
 
 [compat]
 AbbreviatedTypes = "^0.2.1"
+ArgCheck = "^2.1.0"
 GeometryPrimitives = "^0.4.2"
 Reexport = "^1.0.0"
 SimpleConstants = "^0.1.1"
