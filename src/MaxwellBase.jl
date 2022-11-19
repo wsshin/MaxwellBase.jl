@@ -7,7 +7,7 @@ using Reexport
 @reexport using LinearAlgebra, SparseArrays, StaggeredGridCalculus, GeometryPrimitives
 using ArgCheck
 using Base.Threads: @threads  # used in param.jl
-using AbbreviatedTypes
+using AbbreviatedTypes; @define_types_with(Float64)
 using SimpleConstants
 
 export S²ComplexF1, S²ComplexF2, S²ComplexF3, MatParam, ParamInd, ObjInd
