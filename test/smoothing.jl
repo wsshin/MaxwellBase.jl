@@ -28,36 +28,36 @@
     shp4oind = Shape3[]
     εind4oind = ParamInd[]
     μind4oind = ParamInd[]
-    ε4εind = S²ComplexF3[]
-    μ4μind = S²ComplexF3[]
+    ε4εind = S²ComplexF{3,9}[]
+    μ4μind = S²ComplexF{3,9}[]
 
     add_obj!(shp4oind, (εind4oind,μind4oind), (ε4εind,μ4μind), dom_vac, obj_diel)
 
     # Construct arguments and call assign_param!.
     N = g3.N
-    ε3d = create_param_array(N)
+    ε3d = create_param_array(ComplexF, N)
     oind3d_εxx = create_oind_array(N)
     oind3d_εyy = create_oind_array(N)
     oind3d_εzz = create_oind_array(N)
     oind3d_εoo = create_oind_array(N)
 
-    μ3d = create_param_array(N)
+    μ3d = create_param_array(ComplexF, N)
     oind3d_μxx = create_oind_array(N)
     oind3d_μyy = create_oind_array(N)
     oind3d_μzz = create_oind_array(N)
     oind3d_μoo = create_oind_array(N)
 
     boundft = SVec(EE,EE,EE)
-    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
 
     # To-do: test the sanity of the assigned param3d here.  It is relatively easy, and it was very helpful.
 
     # Perform smoothing.
-    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
-    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
 
     ε3dred = view(ε3d, 1:N[1], 1:N[2], 1:N[3], 1:3, 1:3)
 
@@ -153,36 +153,36 @@ end  # @testset "smoothing, box with odd number of voxels"
     shp4oind = Shape3[]
     εind4oind = ParamInd[]
     μind4oind = ParamInd[]
-    ε4εind = S²ComplexF3[]
-    μ4μind = S²ComplexF3[]
+    ε4εind = S²ComplexF{3,9}[]
+    μ4μind = S²ComplexF{3,9}[]
 
     add_obj!(shp4oind, (εind4oind,μind4oind), (ε4εind,μ4μind), dom_vac, obj_diel)
 
     # Construct arguments and call assign_param!.
     N = g3.N
-    ε3d = create_param_array(N)
+    ε3d = create_param_array(ComplexF, N)
     oind3d_εxx = create_oind_array(N)
     oind3d_εyy = create_oind_array(N)
     oind3d_εzz = create_oind_array(N)
     oind3d_εoo = create_oind_array(N)
 
-    μ3d = create_param_array(N)
+    μ3d = create_param_array(ComplexF, N)
     oind3d_μxx = create_oind_array(N)
     oind3d_μyy = create_oind_array(N)
     oind3d_μzz = create_oind_array(N)
     oind3d_μoo = create_oind_array(N)
 
     boundft = SVec(EE,EE,EE)
-    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
 
     # To-do: test the sanity of the assigned param3d here.  It is relatively easy, and it was very helpful.
 
     # Perform smoothing.
-    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
-    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
 
     ε3dred = view(ε3d, 1:N[1], 1:N[2], 1:N[3], 1:3, 1:3)
 

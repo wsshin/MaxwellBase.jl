@@ -4,7 +4,7 @@ N = [5,6,7]
 ncmp = 4
 
 # Test the size of create_field_array().
-F = create_field_array(N, ncmp=ncmp)
+F = create_field_array(ComplexF, N, ncmp=ncmp)
 @test size(F) == (N..., ncmp)
 
 # Test if field_arr2vec() returns a view.

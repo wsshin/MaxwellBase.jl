@@ -1,9 +1,9 @@
 @testset "material" begin
 
 @testset "tensorize" begin
-    @test MaxwellBase.tensorize(3) === SMatrix{3,3,ComplexF64,9}(3,0,0, 0,3,0, 0,0,3)
-    @test MaxwellBase.tensorize([2,4,6]) === SMatrix{3,3,ComplexF64,9}(2,0,0, 0,4,0, 0,0,6)
-    @test MaxwellBase.tensorize([1 4 7; 2 5 8; 3 6 9]) === SMatrix{3,3,ComplexF64,9}(1,2,3,4,5,6,7,8,9)
+    @test MaxwellBase.tensorize(3) === S²Mat{3,9}(3,0,0, 0,3,0, 0,0,3)
+    @test MaxwellBase.tensorize([2,4,6]) === S²Mat{3,9}(2,0,0, 0,4,0, 0,0,6)
+    @test MaxwellBase.tensorize([1 4 7; 2 5 8; 3 6 9]) === S²Mat{3,9}(1,2,3,4,5,6,7,8,9)
 end
 
 @testset "Material" begin
@@ -24,7 +24,7 @@ end
     ε3temp = zeros(ComplexF64, 3, 3)
     ε3temp[1:2,1:2] .= ε2
     ε3temp[3,3] = rand(ComplexF64)
-    ε3 = MaxwellBase.S²ComplexF3(ε3temp)
+    ε3 = MaxwellBase.S²Number3(ε3temp)
 
     τ2 = MaxwellBase.τ_trans(ε2)
     τ3 = MaxwellBase.τ_trans(ε3)
