@@ -31,9 +31,9 @@ end  # @testset "Object"
 #     @test all(map(x->(x==matparam(c_eSi,PRIM)), matparam.(obj_array,PRIM)))
 #     @test all(map(x->(x==matparam(c_eSi,DUAL)), matparam.(obj_array,DUAL)))
 #
-#     oind2obj = Object{3}[]
-#     pind2matprm = (S²ComplexF3[], S²ComplexF3[])
-#     add_obj!(oind2obj, pind2matprm, obj_array)
+#     obj4oind = Object{3}[]
+#     matprm4pind = (S²ComplexF3[], S²ComplexF3[])
+#     add_obj!(obj4oind, matprm4pind, obj_array)
 # end  # @testset "periodize"
 
 

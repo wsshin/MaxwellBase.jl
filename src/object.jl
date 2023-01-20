@@ -9,7 +9,7 @@
 # "extend" bounds for Shape by defining it as GeometryPrimitives.bounds(::Interval) = ....
 # Then, exporting bounds exports this whole collection of bounds, both for Shape and Interval.
 export Object
-export shape, matparam, max∆l, sub_pind2matprm, add_obj!, periodize  #, surfpt_nearby, normal
+export shape, matparam, max∆l, sub_matprm4pind, add_obj!, periodize  #, surfpt_nearby, normal
 # export lsf, bound_, L_, center_, dist2bound, bound_contains, ∆lmax, sphere, transform,
 #     surfnormal, surfpoint  # functions
 # import Base:size, getindex, contains, isless, union, intersect
@@ -35,59 +35,59 @@ shape(obj::Object) = obj.shp
 matparam(obj::Object, ft::FieldType) = matparam(obj.mat, ft)
 max∆l(obj::Object) = obj.∆lmax
 
-# Relationships between pind2matprm, oind2pind, oind2shp
+# Relationships between matprm4pind, pind4oind, shp4oind
 #
-# - pind2matprm is a vector of material parameter tensors.  pind2matprm[n] is a 3×3 material
+# - matprm4pind is a vector of material parameter tensors.  matprm4pind[n] is a 3×3 material
 # parameter tensor for the parameter index n.
 #
-# - oind2pind is a map from the object index to the parameter index.
+# - pind4oind is a map from the object index to the parameter index.
 #
-# - oind2shp is a map from the object index to the shape.
+# - shp4oind is a map from the object index to the shape.
 
 # Returns a vector of submatrices of material parameter tensors.
 # We return a vector of submatrices rather than a vector of submatrix views, because
-# assign_param!() requires the entries of its argument pind2matprm to be SMatrix rather than
+# assign_param!() requires the entries of its argument matprm4pind to be SMatrix rather than
 # views of SMatrix.
-sub_pind2matprm(pind2matprm::AbsVec{<:S²Number{Kf,Kf²}}, inds::SInteger) where {Kf,Kf²} =
-    [mp[inds,inds] for mp = pind2matprm]  # mp[inds,inds]: S²Mat
+sub_matprm4pind(matprm4pind::AbsVec{<:S²Number{Kf,Kf²}}, inds::SInteger) where {Kf,Kf²} =
+    [mp[inds,inds] for mp = matprm4pind]  # mp[inds,inds]: S²Mat
 
-# Consider using resize! on oind2shp.
-function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-                  pind2matprm::Tuple{AbsVec{<:S²Number3},AbsVec{<:S²Number3}},
+# Consider using resize! on shp4oind.
+function add_obj!(shp4oind::AbsVec{Shape{K,K²}}, pind4oind::Tuple2{AbsVec{ParamInd}},
+                  matprm4pind::Tuple{AbsVec{<:S²Number3},AbsVec{<:S²Number3}},
                   objs::AbsVec{Object{K,<:Shape{K,K²}}}
                   ) where {K,K²}
     for obj = objs
-        add_obj!(oind2shp, oind2pind, pind2matprm, obj)
+        add_obj!(shp4oind, pind4oind, matprm4pind, obj)
     end
 end
 
-# Consider using resize! on oind2shp.
-function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-                  pind2matprm::Tuple{AbsVec{<:S²Number3},AbsVec{<:S²Number3}},
+# Consider using resize! on shp4oind.
+function add_obj!(shp4oind::AbsVec{Shape{K,K²}}, pind4oind::Tuple2{AbsVec{ParamInd}},
+                  matprm4pind::Tuple{AbsVec{<:S²Number3},AbsVec{<:S²Number3}},
                   objs::Object{K,<:Shape{K,K²}}...
                   ) where {K,K²}
     for obj = objs
-        add_obj!(oind2shp, oind2pind, pind2matprm, obj)
+        add_obj!(shp4oind, pind4oind, matprm4pind, obj)
     end
 end
 
-# Populate `oind2shp`, `oind2pind`, `pind2matprm` with a given object.  See above for the
-# meaning of `oind2shp`, `oind2pind`, `pind2matprm`.  In doing so, figure out the unique
-# indices for the material parameters and use them as pind in `oind2pind` and `pind2matprm`.
+# Populate `shp4oind`, `pind4oind`, `matprm4pind` with a given object.  See above for the
+# meaning of `shp4oind`, `pind4oind`, `matprm4pind`.  In doing so, figure out the unique
+# indices for the material parameters and use them as pind in `pind4oind` and `matprm4pind`.
 #
 # When I put an periodic array of objects, some object could be across a boundary.  In that
 # case, the rule is to put two different objects at the negative-end and positive-end
 # boundaries.  Make sure, though, the two objects have the same surface normal at the
 # boundary points, so that the surface normal calculation is not ambiguous there.
 #
-# Note that pind2matprm stores the same material parameter "value" only once.  Therefore,
+# Note that matprm4pind stores the same material parameter "value" only once.  Therefore,
 # if two objects are created with different Material instances with the same material
 # parameter tensor, then the two objects' materials are assigned with the same pind.
-function add_obj!(oind2shp::AbsVec{Shape{K,K²}},  # initially empty vector
-                  oind2pind::Tuple2{AbsVec{ParamInd}},  # tuple of initially empty vectors
-                  pind2matprm::Tuple2{AbsVec{<:S²Number3}},  # tuple of initially empty vectors
+function add_obj!(shp4oind::AbsVec{Shape{K,K²}},  # initially empty vector
+                  pind4oind::Tuple2{AbsVec{ParamInd}},  # tuple of initially empty vectors
+                  matprm4pind::Tuple2{AbsVec{<:S²Number3}},  # tuple of initially empty vectors
                   obj::Object{K,<:Shape{K,K²}}) where {K,K²}
-    push!(oind2shp, shape(obj))  # append obj (for potential use of oind2obj with KDTree, must use pushfirst! to prepend)
+    push!(shp4oind, shape(obj))  # append obj (for potential use of obj4oind with KDTree, must use pushfirst! to prepend)
 
     # Assign the material parameter indices to obj.
     # If the material is aleady used in some object that was previously added, then use the
@@ -95,7 +95,7 @@ function add_obj!(oind2shp::AbsVec{Shape{K,K²}},  # initially empty vector
     for ft = EH
         nft = Int(ft)
 
-        mp, on2pn, pn2mp = matparam(obj,ft), oind2pind[nft], pind2matprm[nft]
+        mp, on2pn, pn2mp = matparam(obj,ft), pind4oind[nft], matprm4pind[nft]
         pind = findlast(x -> x==mp, pn2mp)  # number if mp is already in pn2mp
         pind===nothing && (push!(pn2mp, mp); pind = length(pn2mp))  # update pind if mp is not in pn2mp
         push!(on2pn, pind)

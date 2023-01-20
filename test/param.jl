@@ -22,37 +22,37 @@
     # obj_diel = Object(Ball([0,0,0], 1), diel)
 
     # Add objects.
-    oind2shp = Shape3[]
-    oind2εind = ParamInd[]
-    oind2μind = ParamInd[]
-    εind2ε = S²ComplexF3[]
-    μind2μ = S²ComplexF3[]
+    shp4oind = Shape3[]
+    εind4oind = ParamInd[]
+    μind4oind = ParamInd[]
+    ε4εind = S²ComplexF3[]
+    μ4μind = S²ComplexF3[]
 
-    add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
+    add_obj!(shp4oind, (εind4oind,μind4oind), (ε4εind,μ4μind), dom_vac, obj_diel)
 
     # Construct arguments and call assign_param!.
     N = g3.N
     ε3d = create_param_array(N)
-    εxx_oind3d = create_oind_array(N)
-    εyy_oind3d = create_oind_array(N)
-    εzz_oind3d = create_oind_array(N)
-    εoo_oind3d = create_oind_array(N)
+    oind3d_εxx = create_oind_array(N)
+    oind3d_εyy = create_oind_array(N)
+    oind3d_εzz = create_oind_array(N)
+    oind3d_εoo = create_oind_array(N)
 
     μ3d = create_param_array(N)
-    μxx_oind3d = create_oind_array(N)
-    μyy_oind3d = create_oind_array(N)
-    μzz_oind3d = create_oind_array(N)
-    μoo_oind3d = create_oind_array(N)
+    oind3d_μxx = create_oind_array(N)
+    oind3d_μyy = create_oind_array(N)
+    oind3d_μzz = create_oind_array(N)
+    oind3d_μoo = create_oind_array(N)
 
     boundft = SVec(EE,EE,EE)
-    assign_param!(ε3d, (μxx_oind3d,μyy_oind3d,μzz_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(ε3d, tuple(μoo_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), oind2shp, oind2μind, μind2μ, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, tuple(εoo_oind3d), oind2shp, oind2μind, μind2μ, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
 
     # Perform smoothing.
-    smooth_param!(ε3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
-    smooth_param!(ε3d, tuple(εoo_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
 
     ∆l = g3.∆l[nDL]
     ∆l′ = g3.∆l[nPR]
@@ -88,37 +88,37 @@ end  # @testset "create_paramop"
     # obj_diel = Object(Ball([0,0,0], 1), diel)
 
     # Add objects.
-    oind2shp = Shape3[]
-    oind2εind = ParamInd[]
-    oind2μind = ParamInd[]
-    εind2ε = S²ComplexF3[]
-    μind2μ = S²ComplexF3[]
+    shp4oind = Shape3[]
+    εind4oind = ParamInd[]
+    μind4oind = ParamInd[]
+    ε4εind = S²ComplexF3[]
+    μ4μind = S²ComplexF3[]
 
-    add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), dom_vac, obj_diel)
+    add_obj!(shp4oind, (εind4oind,μind4oind), (ε4εind,μ4μind), dom_vac, obj_diel)
 
     # Construct arguments and call assign_param!.
     N = g3.N
     ε3d = create_param_array(N)
-    εxx_oind3d = create_oind_array(N)
-    εyy_oind3d = create_oind_array(N)
-    εzz_oind3d = create_oind_array(N)
-    εoo_oind3d = create_oind_array(N)
+    oind3d_εxx = create_oind_array(N)
+    oind3d_εyy = create_oind_array(N)
+    oind3d_εzz = create_oind_array(N)
+    oind3d_εoo = create_oind_array(N)
 
     μ3d = create_param_array(N)
-    μxx_oind3d = create_oind_array(N)
-    μyy_oind3d = create_oind_array(N)
-    μzz_oind3d = create_oind_array(N)
-    μoo_oind3d = create_oind_array(N)
+    oind3d_μxx = create_oind_array(N)
+    oind3d_μyy = create_oind_array(N)
+    oind3d_μzz = create_oind_array(N)
+    oind3d_μoo = create_oind_array(N)
 
     boundft = SVec(EE,EE,EE)
-    assign_param!(ε3d, (μxx_oind3d,μyy_oind3d,μzz_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(ε3d, tuple(μoo_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), oind2shp, oind2μind, μind2μ, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
-    assign_param!(μ3d, tuple(εoo_oind3d), oind2shp, oind2μind, μind2μ, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
+    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τl, g3.isbloch)
 
     # Perform smoothing.
-    smooth_param!(ε3d, (εxx_oind3d,εyy_oind3d,εzz_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
-    smooth_param!(ε3d, tuple(εoo_oind3d), oind2shp, oind2εind, εind2ε, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
 
     ∆l = g3.∆l[nDL]
     ∆l′ = g3.∆l[nPR]
