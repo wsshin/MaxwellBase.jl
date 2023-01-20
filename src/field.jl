@@ -19,8 +19,8 @@ export create_field_array, field_arr2vec, isfield_ortho_shape
 # contiguous block in memory space.
 #
 # Keyword argument ncmp is type parameter Kf elsewhere.
-create_field_array(N::AbsVecInteger; ncmp::Int=3) = create_field_array(SInt{length(N)}(N), ncmp=ncmp)
-create_field_array(N::SInt; ncmp::Int=3) = zeros(ComplexF, N..., ncmp)
+create_field_array(T::Type, N::AbsVecInteger; ncmp::Int=3) = create_field_array(T, SInt{length(N)}(N), ncmp=ncmp)
+create_field_array(T::Type, N::SInt; ncmp::Int=3) = zeros(T, N..., ncmp)
 
 
 # Create a vector version of the field array.

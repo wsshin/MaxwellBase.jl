@@ -48,22 +48,22 @@ max∆l(obj::Object) = obj.∆lmax
 # We return a vector of submatrices rather than a vector of submatrix views, because
 # assign_param!() requires the entries of its argument pind2matprm to be SMatrix rather than
 # views of SMatrix.
-sub_pind2matprm(pind2matprm::AbsVec{S²ComplexF{Kf,Kf²}}, inds::SInteger) where {Kf,Kf²} =
+sub_pind2matprm(pind2matprm::AbsVec{<:S²Number{Kf,Kf²}}, inds::SInteger) where {Kf,Kf²} =
     [mp[inds,inds] for mp = pind2matprm]  # mp[inds,inds]: S²Mat
 
-# Consider using resize! on oind2obj.
+# Consider using resize! on oind2shp.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-                  pind2matprm::Tuple{AbsVec{S²ComplexF3},AbsVec{S²ComplexF3}},
+                  pind2matprm::Tuple{AbsVec{<:S²Number3},AbsVec{<:S²Number3}},
                   objs::AbsVec{Object{K,<:Shape{K,K²}}}
                   ) where {K,K²}
     for obj = objs
-        add_obj!(oind2obj, oind2pind, pind2matprm, obj)
+        add_obj!(oind2shp, oind2pind, pind2matprm, obj)
     end
 end
 
-# Consider using resize! on oind2obj.
+# Consider using resize! on oind2shp.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}}, oind2pind::Tuple2{AbsVec{ParamInd}},
-                  pind2matprm::Tuple{AbsVec{S²ComplexF3},AbsVec{S²ComplexF3}},
+                  pind2matprm::Tuple{AbsVec{<:S²Number3},AbsVec{<:S²Number3}},
                   objs::Object{K,<:Shape{K,K²}}...
                   ) where {K,K²}
     for obj = objs
@@ -85,7 +85,7 @@ end
 # parameter tensor, then the two objects' materials are assigned with the same pind.
 function add_obj!(oind2shp::AbsVec{Shape{K,K²}},  # initially empty vector
                   oind2pind::Tuple2{AbsVec{ParamInd}},  # tuple of initially empty vectors
-                  pind2matprm::Tuple2{AbsVec{S²ComplexF3}},  # tuple of initially empty vectors
+                  pind2matprm::Tuple2{AbsVec{<:S²Number3}},  # tuple of initially empty vectors
                   obj::Object{K,<:Shape{K,K²}}) where {K,K²}
     push!(oind2shp, shape(obj))  # append obj (for potential use of oind2obj with KDTree, must use pushfirst! to prepend)
 
@@ -97,7 +97,7 @@ function add_obj!(oind2shp::AbsVec{Shape{K,K²}},  # initially empty vector
 
         mp, on2pn, pn2mp = matparam(obj,ft), oind2pind[nft], pind2matprm[nft]
         pind = findlast(x -> x==mp, pn2mp)  # number if mp is already in pn2mp
-        pind==nothing && (push!(pn2mp, mp); pind = length(pn2mp))  # update pind if mp is not in pn2mp
+        pind===nothing && (push!(pn2mp, mp); pind = length(pn2mp))  # update pind if mp is not in pn2mp
         push!(on2pn, pind)
     end
 

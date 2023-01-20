@@ -10,14 +10,14 @@ using Base.Threads: @threads  # used in param.jl
 using AbbreviatedTypes; @define_types_with(Float64)
 using SimpleConstants
 
-export S²ComplexF1, S²ComplexF2, S²ComplexF3, MatParam, ParamInd, ObjInd
+export S²Number1, S²Number2, S²Number3, AbsMatParam, ParamInd, ObjInd
 
 ## Type aliases
-const S²ComplexF1 = S²ComplexF{1,1}
-const S²ComplexF2 = S²ComplexF{2,4}
-const S²ComplexF3 = S²ComplexF{3,9}
+const S²Number1 = S²Number{1,1}
+const S²Number2 = S²Number{2,4}
+const S²Number3 = S²Number{3,9}
 
-const MatParam = Union{Number,AbsVecNumber,AbsMatNumber}
+const AbsMatParam = Union{Number,AbsVecNumber,AbsMatNumber}
 const ParamInd = UInt8  # change this to handle more than 2⁸ = 256 materials
 const ObjInd = UInt16  # change this to handle more than 2¹⁶ = 65536 objects
 
