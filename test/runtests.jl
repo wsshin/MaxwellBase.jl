@@ -3,7 +3,6 @@ using AbbreviatedTypes; @define_types_with(Float64)
 using SimpleConstants
 using Test
 using Statistics: mean
-using AbbreviatedTypes
 
 Base.isapprox(a::Tuple, b::Tuple; kws...) = all(p -> isapprox(p...; kws...), zip(a,b))
 
