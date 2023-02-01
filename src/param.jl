@@ -6,18 +6,18 @@ create_paramop(paramKd::AbsArrNumber,  # material parameter array
                ∆l′⁻¹::NTuple{K,AbsVecNumber},  # inverse of line segments to divide by (defined at field voxel corners); vectors of length N
                isbloch::AbsVecBool,  # for K = 3, boundary conditions in x, y, z
                e⁻ⁱᵏᴸ::AbsVecNumber=ones(K);  # for K = 3, Bloch phase factor in x, y, z
-               order_cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+               cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
                ) where {K} =
-    create_paramop(paramKd, SVec{K}(isfwd_in), ∆l, ∆l′⁻¹, SVec{K}(isbloch), SVec{K}(e⁻ⁱᵏᴸ); order_cmpfirst)
+    create_paramop(paramKd, SVec{K}(isfwd_in), ∆l, ∆l′⁻¹, SVec{K}(isbloch), SVec{K}(e⁻ⁱᵏᴸ); cmpfirst)
 
 # Version for scalar material parameters
 function create_paramop(paramKd::AbsArrNumber{K₊₂};  # scalar material parameter array
-                        order_cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+                        cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
                         ) where {K₊₂}
     K = K₊₂ - 2
     N = SVec(ntuple(k->size(paramKd,k)-1, Val(K)))  # for -1, see comments about size of paramKd in assignment.jl
     kdiag = 0
-    paramop = create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)
+    paramop = create_paramop_supdiag(paramKd, kdiag, N; cmpfirst)
 
     return paramop
 end
@@ -32,7 +32,7 @@ function create_paramop(paramKd::AbsArrNumber{K₊₂},  # material parameter ar
                         ∆l′⁻¹::NTuple{K,AbsVecNumber},  # inverse of line segments to divide by (defined at field voxel corners); vectors of length N
                         isbloch::SBool{K},  # for K = 3, boundary conditions in x, y, z
                         e⁻ⁱᵏᴸ::SNumber{K};  # for K = 3, Bloch phase factor in x, y, z
-                        order_cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+                        cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
                         ) where {K,K₊₂}
     @assert K₊₂==K+2
 
@@ -80,7 +80,7 @@ function create_paramop(paramKd::AbsArrNumber{K₊₂},  # material parameter ar
     # matrix multiplied for symmetry to the left of the material parameter matrix
     # multiplies the same area factor to the two fields being averaged.  (See my notes
     # on Jul/16/2018 in MaxwellFDFD in Agenda.)
-    Mout = create_mean(isfwd_out, N, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
+    Mout = create_mean(isfwd_out, N, isbloch, e⁻ⁱᵏᴸ; cmpfirst)
 
     # For the input averaging, ∆l and ∆l′ are supplied to create_mean in order to create
     # a line integral averaging operator.  This is because the inverse of the length
@@ -89,22 +89,22 @@ function create_paramop(paramKd::AbsArrNumber{K₊₂},  # material parameter ar
     # segments.  The ∆l factors multiplied inside create_minfo cancel the effect of this
     # multiplication with the nonuniform line segments.  (See my notes on Jul/16/2018 in
     # MaxwellFDFD in Agenda.)
-    Min = create_mean(isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
+    Min = create_mean(isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ; cmpfirst)
 
     # Off-diagonal components of material parameter tensor
     # Min and Mout are block-diagonal matrices, but create_paramop_supdiag() generates
     # block-off-diagonal matrices for 1 ≤ kdiag ≤ Kf-1.  See my bullet point entitled
     # [Update (May/13/2018)] in RN - Subpixel Smoothing.
     kdiag = 1
-    paramop = create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)
+    paramop = create_paramop_supdiag(paramKd, kdiag, N; cmpfirst)
     for kdiag = 2:Kf-1  # index of diagonal of material parameter tensor
-        paramop += create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)
+        paramop += create_paramop_supdiag(paramKd, kdiag, N; cmpfirst)
     end
     paramop = Mout * paramop * Min
 
     # Diagonal components of material parameter tensor
     kdiag = 0
-    paramop += create_paramop_supdiag(paramKd, kdiag, N; order_cmpfirst)  # diagonal components of material parameter tensor
+    paramop += create_paramop_supdiag(paramKd, kdiag, N; cmpfirst)  # diagonal components of material parameter tensor
 
     return paramop
 end
@@ -140,7 +140,7 @@ end
 function create_paramop_supdiag(paramKd::AbsArr{P,K₊₂},  # size of last two dimensions is Kf-by-Kf
                                 kdiag::Integer,  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
                                 N::SInt{K};  # size of grid
-                                order_cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+                                cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
                                 ) where {P,K,K₊₂}
     @assert K₊₂==K+2
 
@@ -159,9 +159,9 @@ function create_paramop_supdiag(paramKd::AbsArr{P,K₊₂},  # size of last two 
     CI = CartesianIndices(N.data)
     LI = LinearIndices(N.data)
     for nv = 1:Kf  # row index of material parameter tensor
-        istr, ioff = order_cmpfirst ? (Kf, nv-Kf) : (1, M*(nv-1))  # (row stride, row offset)
+        istr, ioff = cmpfirst ? (Kf, nv-Kf) : (1, M*(nv-1))  # (row stride, row offset)
         nw = mod1(nv+kdiag, Kf)  # column index of material parameter tensor
-        jstr, joff = order_cmpfirst ? (Kf, nw-Kf) : (1, M*(nw-1))  # (column stride, column offset)
+        jstr, joff = cmpfirst ? (Kf, nw-Kf) : (1, M*(nw-1))  # (column stride, column offset)
         for ci = CI
             n += 1
             @inbounds ind = LI[ci]  # linear index of Yee's cell

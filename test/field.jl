@@ -9,10 +9,10 @@ F = create_field_array(ComplexF, N, ncmp=ncmp)
 
 # Test if field_arr2vec() returns a view.
 F .= rand(eltype(F), size(F))
-f = field_arr2vec(F, order_cmpfirst=false)
-f_cmpfirst = field_arr2vec(F, order_cmpfirst=true)
+f = field_arr2vec(F, cmpfirst=false)
+f_cmpfirst = field_arr2vec(F, cmpfirst=true)
 
-# Test if order_cmpfirst is working as intended.
+# Test if cmpfirst is working as intended.
 @test reshape(transpose(reshape(f_cmpfirst, ncmp, :)), :) == f
 
 end  # @testset "field"

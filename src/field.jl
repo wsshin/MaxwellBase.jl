@@ -36,9 +36,9 @@ create_field_array(T::Type, N::SInt; ncmp::Int=3) = zeros(T, N..., ncmp)
 # to save memory.  However, it turns out that such an implementation returns a vector that
 # is slow on GPU.
 function field_arr2vec(fKd::AbsArrNumber{K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
-                       order_cmpfirst::Bool=true
+                       cmpfirst::Bool=true
                        ) where {K₊₁}
-    p = order_cmpfirst ? (K₊₁, ntuple(identity,Val(K₊₁-1))...) : ntuple(identity,Val(K₊₁))
+    p = cmpfirst ? (K₊₁, ntuple(identity,Val(K₊₁-1))...) : ntuple(identity,Val(K₊₁))
 
     return reshape(permutedims(fKd,p), :)
 end
