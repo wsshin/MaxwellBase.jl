@@ -11,6 +11,7 @@ struct MaxwellUnit
     # General quantities (not specific to electromagnetism)
     L::Float  # length unit
     ω::Float  # angular frequency unit
+    k::Float  # wavenumber unit
 
     # Electromagnetic quantities, in order of frequency of appearance in Maxwell's equations
     E::Float  # E-field unit
@@ -21,6 +22,8 @@ struct MaxwellUnit
 
     S::Float  # Poynting vector unit
     P::Float  # power unit
+    u::Float  # energy density unit
+    U::Float  # energy unit
 
     V::Float  # voltage unit
     I::Float  # electric current unit
@@ -43,15 +46,18 @@ struct MaxwellUnit
         # following units are independent of the length unit L₀:
         H₀ = E₀ / η₀  # H-field is measured in in E₀/η₀ (L₀-independent)
         S₀ = E₀ * H₀  # Poynting vector is measured in E₀H₀ (L₀-independent)
+        u₀ = S₀ / c₀  # energy density is measured in ε₀E₀² = μ₀H₀² = E₀H₀/c₀ (L₀-independent)
 
         # The following units are dependent on the length unit L₀:
         ω₀ = c₀ / L₀  # frequency is measured in c₀/L₀
+        k₀ = 1 / L₀  # wavenumber is measured in 1/L₀
         J₀ = H₀ / L₀  # electric current density is measured in H₀/L₀
         M₀ = E₀ / L₀  # magnetic current density is measured in E₀/L₀
         I₀ = J₀ * L₀^2  # electric current is measured in J₀L₀²
         V₀ = E₀ * L₀  # voltage is measured in E₀L₀
         P₀ = I₀ * V₀  # power is measured in I₀V₀ = S₀L₀²
+        U₀ = u₀ * L₀^3  # energy is measured in u₀L₀³ = P₀L₀/c₀
 
-        new(ε₀, μ₀, c₀, η₀, L₀, ω₀, E₀, H₀, J₀, M₀, S₀, P₀, V₀, I₀)
+        new(ε₀, μ₀, c₀, η₀, L₀, ω₀, k₀, E₀, H₀, J₀, M₀, S₀, P₀, u₀, U₀, V₀, I₀)
     end
 end
