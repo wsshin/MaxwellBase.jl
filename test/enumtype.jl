@@ -11,7 +11,7 @@ end
 end
 
 @testset "integers" begin
-    @test Int.(SVec(instances(FieldType))) == nEH == [nE, nH]
+    @test Int.(SVector(instances(FieldType))) == nEH == [nE, nH]
 end
 
 @testset "alter" begin

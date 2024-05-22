@@ -19,8 +19,8 @@ export create_field_array, field_arr2vec, isfield_ortho_shape
 # contiguous block in memory space.
 #
 # Keyword argument ncmp is type parameter Kf elsewhere.
-create_field_array(T::Type, N::AbsVecInteger; ncmp::Int=3) = create_field_array(T, SInt{length(N)}(N), ncmp=ncmp)
-create_field_array(T::Type, N::SInt; ncmp::Int=3) = zeros(T, N..., ncmp)
+create_field_array(T::Type, N::AbstractVector{<:Integer}; ncmp::Int=3) = create_field_array(T, SVector{length(N)}(N), ncmp=ncmp)
+create_field_array(T::Type, N::SVector{<:Any,Int}; ncmp::Int=3) = zeros(T, N..., ncmp)
 
 
 # Create a vector version of the field array.
@@ -35,7 +35,7 @@ create_field_array(T::Type, N::SInt; ncmp::Int=3) = zeros(T, N..., ncmp)
 # Initially this function was implemented with PermutedDimsArray() instead of permutedims()
 # to save memory.  However, it turns out that such an implementation returns a vector that
 # is slow on GPU.
-function field_arr2vec(fKd::AbsArrNumber{K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
+function field_arr2vec(fKd::AbstractArray{<:Number,K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
                        cmpfirst::Bool=true
                        ) where {K₊₁}
     p = cmpfirst ? (K₊₁, 1:(K₊₁-1)...) : tuple(1:K₊₁...)

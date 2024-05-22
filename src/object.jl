@@ -17,19 +17,19 @@ export shape, matparam, max∆l, sub_matprm4pind, add_obj!, periodize  #, surfpt
 mutable struct Object{K,S<:Shape{K}}  # K: dimension of space
     shp::S
     mat::Material
-    ∆lmax::SVec{K,Float}
+    ∆lmax::SVector{K,Float64}
     Object{K,S}(shp, mat, ∆lmax) where {K,S} = new(shp, mat, ∆lmax)
 end
 
-Object(shp::S, mat::Material, ∆lmax::SVec{K}=@SVector(fill(Inf,K))) where {K,S<:Shape{K}} =
+Object(shp::S, mat::Material, ∆lmax::SVector{K}=@SVector(fill(Inf,K))) where {K,S<:Shape{K}} =
     Object{K,S}(shp, mat, ∆lmax)
-Object(shp::Shape{K}, mat::Material, ∆lmax::AbsVec) where {K} = Object(shp, mat, SVec{K}(∆lmax))
-Object(shp::Shape{K}, mat::Material, ∆lmax::Real) where {K} = Object(shp, mat, SVec(ntuple(k->∆lmax, Val(K))))
+Object(shp::Shape{K}, mat::Material, ∆lmax::AbstractVector) where {K} = Object(shp, mat, SVector{K}(∆lmax))
+Object(shp::Shape{K}, mat::Material, ∆lmax::Real) where {K} = Object(shp, mat, SVector(ntuple(k->∆lmax, Val(K))))
 
 # Create the user interface such that maxwellsys.add(shape, material, ∆lmax) uses this function.
 # setmat!(obj::Object, m::Material) = (obj.mat = m; obj)
-# setmax∆l!(obj::Object{K}, ∆lmax::AbsVec) where {K} = (obj.∆lmax = SVec{K}(∆lmax); obj)
-# setmax∆l!(obj::Object{K}, ∆lmax::Number) where {K} = setmax∆l!(obj, SVec(ntuple(k->∆lmax, Val(K))))
+# setmax∆l!(obj::Object{K}, ∆lmax::AbstractVector) where {K} = (obj.∆lmax = SVector{K}(∆lmax); obj)
+# setmax∆l!(obj::Object{K}, ∆lmax::Number) where {K} = setmax∆l!(obj, SVector(ntuple(k->∆lmax, Val(K))))
 
 shape(obj::Object) = obj.shp
 matparam(obj::Object, ft::FieldType) = matparam(obj.mat, ft)
@@ -48,13 +48,13 @@ max∆l(obj::Object) = obj.∆lmax
 # We return a vector of submatrices rather than a vector of submatrix views, because
 # assign_param!() requires the entries of its argument matprm4pind to be SMatrix rather than
 # views of SMatrix.
-sub_matprm4pind(matprm4pind::AbsVec{<:S²Number{Kf,Kf²}}, inds::SInteger) where {Kf,Kf²} =
+sub_matprm4pind(matprm4pind::AbstractVector{<:SMatrix{Kf,Kf,<:Number,Kf²}}, inds::SVector{<:Any,<:Integer}) where {Kf,Kf²} =
     [mp[inds,inds] for mp = matprm4pind]  # mp[inds,inds]: S²Mat
 
 # Consider using resize! on shp4oind.
-function add_obj!(shp4oind::AbsVec{Shape{K,K²}}, pind4oind::Tuple2{AbsVec{ParamInd}},
-                  matprm4pind::Tuple{AbsVec{<:S²Number3},AbsVec{<:S²Number3}},
-                  objs::AbsVec{Object{K,<:Shape{K,K²}}}
+function add_obj!(shp4oind::AbstractVector{Shape{K,K²}}, pind4oind::NTuple{2,AbstractVector{ParamInd}},
+                  matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},
+                  objs::AbstractVector{Object{K,<:Shape{K,K²}}}
                   ) where {K,K²}
     for obj = objs
         add_obj!(shp4oind, pind4oind, matprm4pind, obj)
@@ -62,8 +62,8 @@ function add_obj!(shp4oind::AbsVec{Shape{K,K²}}, pind4oind::Tuple2{AbsVec{Param
 end
 
 # Consider using resize! on shp4oind.
-function add_obj!(shp4oind::AbsVec{Shape{K,K²}}, pind4oind::Tuple2{AbsVec{ParamInd}},
-                  matprm4pind::Tuple{AbsVec{<:S²Number3},AbsVec{<:S²Number3}},
+function add_obj!(shp4oind::AbstractVector{Shape{K,K²}}, pind4oind::NTuple{2,AbstractVector{ParamInd}},
+                  matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},
                   objs::Object{K,<:Shape{K,K²}}...
                   ) where {K,K²}
     for obj = objs
@@ -83,9 +83,9 @@ end
 # Note that matprm4pind stores the same material parameter "value" only once.  Therefore,
 # if two objects are created with different Material instances with the same material
 # parameter tensor, then the two objects' materials are assigned with the same pind.
-function add_obj!(shp4oind::AbsVec{Shape{K,K²}},  # initially empty vector
-                  pind4oind::Tuple2{AbsVec{ParamInd}},  # tuple of initially empty vectors
-                  matprm4pind::Tuple2{AbsVec{<:S²Number3}},  # tuple of initially empty vectors
+function add_obj!(shp4oind::AbstractVector{Shape{K,K²}},  # initially empty vector
+                  pind4oind::NTuple{2,AbstractVector{ParamInd}},  # tuple of initially empty vectors
+                  matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},  # tuple of initially empty vectors
                   obj::Object{K,<:Shape{K,K²}}) where {K,K²}
     push!(shp4oind, shape(obj))  # append obj (for potential use of obj4oind with KDTree, must use pushfirst! to prepend)
 
@@ -104,7 +104,7 @@ function add_obj!(shp4oind::AbsVec{Shape{K,K²}},  # initially empty vector
     return nothing
 end
 
-function GeometryPrimitives.periodize(obj::Object{K}, A::AbsMat, ∆range::Shape{K}) where {K}
+function GeometryPrimitives.periodize(obj::Object{K}, A::AbstractMatrix, ∆range::Shape{K}) where {K}
     shp_array = periodize(obj.shp, A, ∆range)
     N = length(shp_array)
     obj_array = Vector{Object{K}}(N)
@@ -133,19 +133,19 @@ end
 
 # # contains
 # # Sometimes, we only have level-set functions rather than Shape instances.
-# @inline contains(lsf::Function, l::Tuple3{Real}, isinclusive::Bool=true) = isinclusive ? lsf(l) ≥ 0 : lsf(l) > 0
-# @inline contains(s::Shape, l::Tuple3{Real}, isinclusive::Bool=true) = contains(lsf(s), l, isinclusive)
+# @inline contains(lsf::Function, l::NTuple{3,Real}, isinclusive::Bool=true) = isinclusive ? lsf(l) ≥ 0 : lsf(l) > 0
+# @inline contains(s::Shape, l::NTuple{3,Real}, isinclusive::Bool=true) = contains(lsf(s), l, isinclusive)
 #
 # # Other functions
 # @inline bound_(s::Shape) = bound_(s.cbox)
 # @inline bound_(s::Shape, w::Axis) = bound_(s.cbox, w)
 # @inline bound_(s::Shape, w::Axis, sn::Sign) = bound_(s.cbox, w, sn)
-# @inline bound_contains(s::Shape, l::Tuple3{Real}, isinclusive::Bool=true) = contains(s.cbox, l, isinclusive)
+# @inline bound_contains(s::Shape, l::NTuple{3,Real}, isinclusive::Bool=true) = contains(s.cbox, l, isinclusive)
 # @inline L_(s::Shape) = L_(s.cbox)  # scalar
 # @inline center_(s::Shape) = center_(s.cbox)  # scalar
 #
 # # Level-set function manipulation
-# @inline transform(lsf::Function, σ::Tuple3{Real}, ∆::Tuple3{Real}) = l -> lsf(σ .* (l .- ∆))  # σ[w] = 1 for shift, σ[w] = -1 for flip
+# @inline transform(lsf::Function, σ::NTuple{3,Real}, ∆::NTuple{3,Real}) = l -> lsf(σ .* (l .- ∆))  # σ[w] = 1 for shift, σ[w] = -1 for flip
 #
 # @inline union(lsf::Function...) = l -> maximum(map(f->f(l), lsf))
 # @inline union(lsf1::Function, lsf2::Function) = lsf1==lsf2 ? lsf1 : l->max(lsf1(l), lsf2(l))
@@ -158,7 +158,7 @@ end
 # # Calculates the direction normal to the curved surface crossing a voxel by numerical gradient
 # # of the level-set function describing the surface.  The gradient is evaluated at a given point
 # # inside the voxel.
-# function surfnormal(lsf::Function, r::Tuple3{Float}, vxl::Tuple32{Float})
+# function surfnormal(lsf::Function, r::NTuple{3,Float64}, vxl::NTuple{3,NTuple{2,Float64}})
 #     # println("lsf((0,0,0)) = $(lsf((0,0,0))),
 #     #     lsf((-1,0,0)) = $(lsf((-1,0,0))), lsf((1,0,0)) = $(lsf((1,0,0))),
 #     #     lsf((0,-1,0)) = $(lsf((0,-1,0))), lsf((0,1,0)) = $(lsf((0,1,0))),
@@ -181,14 +181,14 @@ end
 #     # println("(∆x, ∆y, ∆z) = $((∆x, ∆y, ∆z))")
 #     # println("(rx, ry, rz) = $((rx, ry, rz))")
 #     # # println("lsf(($rx, $ry, $rz)) = $(lsf((rx,ry,rz)))")
-#     fxn::Float, fxp::Float = lsf((rx-∆x, ry, rz)), lsf((rx+∆x, ry, rz))
-#     fyn::Float, fyp::Float = lsf((rx, ry-∆y, rz)), lsf((rx, ry+∆y, rz))
-#     fzn::Float, fzp::Float = lsf((rx, ry, rz-∆z)), lsf((rx, ry, rz+∆z))
+#     fxn::Float64, fxp::Float64 = lsf((rx-∆x, ry, rz)), lsf((rx+∆x, ry, rz))
+#     fyn::Float64, fyp::Float64 = lsf((rx, ry-∆y, rz)), lsf((rx, ry+∆y, rz))
+#     fzn::Float64, fzp::Float64 = lsf((rx, ry, rz-∆z)), lsf((rx, ry, rz+∆z))
 #     # println("((fxn, fxp), (fyn, fyp), (fzn, fzp)) = $(((fxn, fxp), (fyn, fyp), (fzn, fzp)))")
 #
-#     fxn2::Float, fxp2::Float = lsf2((rx-∆x, ry, rz)), lsf2((rx+∆x, ry, rz))
-#     fyn2::Float, fyp2::Float = lsf2((rx, ry-∆y, rz)), lsf2((rx, ry+∆y, rz))
-#     fzn2::Float, fzp2::Float = lsf2((rx, ry, rz-∆z)), lsf2((rx, ry, rz+∆z))
+#     fxn2::Float64, fxp2::Float64 = lsf2((rx-∆x, ry, rz)), lsf2((rx+∆x, ry, rz))
+#     fyn2::Float64, fyp2::Float64 = lsf2((rx, ry-∆y, rz)), lsf2((rx, ry+∆y, rz))
+#     fzn2::Float64, fzp2::Float64 = lsf2((rx, ry, rz-∆z)), lsf2((rx, ry, rz+∆z))
 #     # println("((fxn2, fxp2), (fyn2, fyp2), (fzn2, fzp2)) = $(((fxn2, fxp2), (fyn2, fyp2), (fzn2, fzp2)))")
 #
 #     neg∂f∂x, neg∂f∂y, neg∂f∂z = (fxn - fxp) / ∆x, (fyn - fyp) / ∆y, (fzn - fzp) / ∆z
@@ -197,7 +197,7 @@ end
 # end
 #
 # # Find the point on a curved surface by moving from a point along a direction.
-# function surfpoint(lsf::Function, r::Tuple3{Float}, v::Tuple3{Float})
+# function surfpoint(lsf::Function, r::NTuple{3,Float64}, v::NTuple{3,Float64})
 #     # println("r = $r, v = $v")
 #     f(t) = lsf(r .+ t.*v)
 #     tsol, isconverged = newtsol(0., f)

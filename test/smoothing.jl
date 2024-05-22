@@ -35,19 +35,19 @@
 
     # Construct arguments and call assign_param!.
     N = g3.N
-    ε3d = create_param_array(ComplexF, N)
+    ε3d = create_param_array(ComplexF64, N)
     oind3d_εxx = create_oind_array(N)
     oind3d_εyy = create_oind_array(N)
     oind3d_εzz = create_oind_array(N)
     oind3d_εoo = create_oind_array(N)
 
-    μ3d = create_param_array(ComplexF, N)
+    μ3d = create_param_array(ComplexF64, N)
     oind3d_μxx = create_oind_array(N)
     oind3d_μyy = create_oind_array(N)
     oind3d_μzz = create_oind_array(N)
     oind3d_μoo = create_oind_array(N)
 
-    boundft = SVec(EE,EE,EE)
+    boundft = SVector(EE,EE,EE)
     assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
     assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
     assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
@@ -160,19 +160,19 @@ end  # @testset "smoothing, box with odd number of voxels"
 
     # Construct arguments and call assign_param!.
     N = g3.N
-    ε3d = create_param_array(ComplexF, N)
+    ε3d = create_param_array(ComplexF64, N)
     oind3d_εxx = create_oind_array(N)
     oind3d_εyy = create_oind_array(N)
     oind3d_εzz = create_oind_array(N)
     oind3d_εoo = create_oind_array(N)
 
-    μ3d = create_param_array(ComplexF, N)
+    μ3d = create_param_array(ComplexF64, N)
     oind3d_μxx = create_oind_array(N)
     oind3d_μyy = create_oind_array(N)
     oind3d_μzz = create_oind_array(N)
     oind3d_μoo = create_oind_array(N)
 
-    boundft = SVec(EE,EE,EE)
+    boundft = SVector(EE,EE,EE)
     assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
     assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
     assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)

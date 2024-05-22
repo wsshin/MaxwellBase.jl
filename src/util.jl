@@ -6,7 +6,7 @@ export create_∆ls
 # - Number of inputs: length of the input vector
 # - Algorithm choices: "Best"
 # - Select "Create a set of SWAP macros".
-@inline function swap_ind!(ind::AbsArrInteger, v::AbsArr, i::Integer, j::Integer)
+@inline function swap_ind!(ind::AbstractArray{<:Integer}, v::AbstractArray, i::Integer, j::Integer)
     @inbounds if v[ind[j]] < v[ind[i]]
         @inbounds ind[i], ind[j] = ind[j], ind[i]
     end
@@ -56,7 +56,7 @@ isuniform(mv::MArray{Tuple{2,2,2},<:Any,3,8}) = @inbounds (mv[1]==mv[2]==mv[3]==
 isuniform(mv::MArray{Tuple{2,2},<:Any,2,4}) = @inbounds (mv[1]==mv[2]==mv[3]==mv[4])
 isuniform(mv::MArray{Tuple{2},<:Any,1,2}) = @inbounds (mv[1]==mv[2])
 
-function create_∆ls(grid::Grid{K}, boundft::SVec{K,FieldType}) where {K}
+function create_∆ls(grid::Grid{K}, boundft::SVector{K,FieldType}) where {K}
     ∆l = grid.∆l
     ∆l⁻¹ = invert_∆l(∆l)
 

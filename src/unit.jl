@@ -3,34 +3,34 @@ export MaxwellUnit
 
 struct MaxwellUnit
     # Quantities whose units are fundamental constants
-    ε::Float  # permittivity unit
-    μ::Float  # permeability unit
-    c::Float  # speed unit
-    η::Float  # impedance unit
+    ε::Float64  # permittivity unit
+    μ::Float64  # permeability unit
+    c::Float64  # speed unit
+    η::Float64  # impedance unit
 
     # General quantities (not specific to electromagnetism)
-    L::Float  # length unit
-    ω::Float  # angular frequency unit
-    k::Float  # wavenumber unit
+    L::Float64  # length unit
+    ω::Float64  # angular frequency unit
+    k::Float64  # wavenumber unit
 
     # Electromagnetic quantities, in order of frequency of appearance in Maxwell's equations
-    E::Float  # E-field unit
-    H::Float  # H-field unit
+    E::Float64  # E-field unit
+    H::Float64  # H-field unit
 
-    J::Float  # electric current density unit
-    M::Float  # magnetic current density unit
+    J::Float64  # electric current density unit
+    M::Float64  # magnetic current density unit
 
-    S::Float  # Poynting vector unit
-    P::Float  # power unit
-    u::Float  # energy density unit
-    U::Float  # energy unit
+    S::Float64  # Poynting vector unit
+    P::Float64  # power unit
+    u::Float64  # energy density unit
+    U::Float64  # energy unit
 
-    V::Float  # voltage unit
-    I::Float  # electric current unit
+    V::Float64  # voltage unit
+    I::Float64  # electric current unit
 
-    function MaxwellUnit(L₀::Real)
+    function MaxwellUnit(L₀)
         # The length unit L₀ is set by users.
-        @argcheck L₀ > 0  # L₀ must be positive
+        @argcheck 1L₀ > 0  # L₀ must be positive
 
         # The E-field unit is arbitrarily chosen as E₀ = 1 V/m.
         E₀ = 1.0  # E-field is measured in V/m

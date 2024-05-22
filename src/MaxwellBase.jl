@@ -5,19 +5,15 @@ module MaxwellBase
 # automatically upon calling `using MaxwellBase`.
 using Reexport
 @reexport using LinearAlgebra, SparseArrays, StaggeredGridCalculus, GeometryPrimitives
-using ArgCheck
+using StaticArrays
 using Base.Threads: @threads  # used in param.jl
-using AbbreviatedTypes; @define_types_with(Float64)
 using SimpleConstants
+using ArgCheck
 
-export S²Number1, S²Number2, S²Number3, AbsMatParam, ParamInd, ObjInd
+export AbstractMatParam, ParamInd, ObjInd
 
 ## Type aliases
-const S²Number1 = S²Number{1,1}
-const S²Number2 = S²Number{2,4}
-const S²Number3 = S²Number{3,9}
-
-const AbsMatParam = Union{Number,AbsVecNumber,AbsMatNumber}
+const AbstractMatParam = Union{Number,AbstractVector{<:Number},AbstractMatrix{<:Number}}
 const ParamInd = UInt8  # change this to handle more than 2⁸ = 256 materials
 const ObjInd = UInt16  # change this to handle more than 2¹⁶ = 65536 objects
 
