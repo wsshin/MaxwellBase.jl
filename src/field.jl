@@ -38,7 +38,7 @@ create_field_array(T::Type, N::SInt; ncmp::Int=3) = zeros(T, N..., ncmp)
 function field_arr2vec(fKd::AbsArrNumber{K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
                        cmpfirst::Bool=true
                        ) where {K₊₁}
-    p = cmpfirst ? (K₊₁, ntuple(identity,Val(K₊₁-1))...) : ntuple(identity,Val(K₊₁))
+    p = cmpfirst ? (K₊₁, 1:(K₊₁-1)...) : tuple(1:K₊₁...)
 
     return reshape(permutedims(fKd,p), :)
 end

@@ -69,7 +69,7 @@ function smooth_param!(paramKd::AbsArr{P,K₊₂},  # parameter array to smooth 
     @assert K²==K^2 && Kf²==Kf^2 && K₊₂==K+2 && (Kf⏐₁==Kf || Kf⏐₁==1)
     @assert size(paramKd,K+1)==size(paramKd,K+2)==Kf
 
-    ci_1 = CartesianIndex(ntuple(x->1, Val(K)))
+    ci_1 = CartesianIndex(@SVector(ones(Int,K))...)
     for nw = 1:Kf⏐₁
         # Set the grid types of the x-, y-, z-locations of Fw.
         #
@@ -94,7 +94,7 @@ function smooth_param!(paramKd::AbsArr{P,K₊₂},  # parameter array to smooth 
 
         oind_cmp′ = oindKd′[nw]
 
-        ind_c = MArray{Tuple{ntuple(x->2,Val(K))...},Int}(undef)  # corner indices inside voxel
+        ind_c = MArray{Tuple{@SVector(fill(2,K))...},Int}(undef)  # corner indices inside voxel
         pind_vxl′ = similar(ind_c)  # material parameter indices inside voxel
         oind_vxl′ = similar(ind_c)  # object indices inside voxel
 
@@ -299,8 +299,8 @@ function smooth_param_vxl(ci_vxl′::Tuple2{CartesianIndex{K}},
         x₀ = t_ind(lcmp, ci_cmp)  # SFloat{3}: location of center of smoothing voxel
         @inbounds lvxl′ = (t_ind(lcmp′,ci_vxl′[1]), t_ind(lcmp′,ci_vxl′[2]))
 
-        @inbounds ci_fg = CartesianIndices(ntuple(x->2,Val(K)))[ind_fg]  # subscritpt of corner ind_fg
-        ci_1 = CartesianIndex(ntuple(x->1, Val(K)))
+        @inbounds ci_fg = CartesianIndices(@SVector(fill(2,K)).data)[ind_fg]  # subscritpt of corner ind_fg
+        ci_1 = CartesianIndex(@SVector(ones(Int,K))...)
         ∆fg = t_ind(∆τcmp′, ci_cmp + ci_fg - ci_1)  # SFloat{3}; nonzero if corner ind_fg is outside periodic boundary
 
         # See "Overall smoothing algorithm" above.
@@ -365,7 +365,7 @@ function amean_param(ci_vxl′::Tuple2{CartesianIndex{K}},
                      pind4oind::AbsVec{ParamInd},  # input map from oind to pind
                      matprm4pind::AbsVec{S²Mat{Kf,Kf²,P}}  # map from pind to electric (magnetic) material parameters; Kf² = Kf^2
                      ) where {P,K,Kf,Kf²}
-    p = S²Mat{Kf,Kf²,P}(ntuple(x->0, Val(Kf²)))
+    p = S²Mat{Kf,Kf²,P}(@SVector(zeros(Int,Kf²)))
     for ci = ci_vxl′[1]:ci_vxl′[2]
         @inbounds pc = matprm4pind[pind4oind[oind_cmp′[ci]]]
         p += pc
@@ -378,7 +378,7 @@ end
 #                      pind4oind::AbsVec{ParamInd},  # input map from oind to pind
 #                      matprm4pind::AbsVec{S²Mat{Kf,Kf²,P}}  # map from pind to electric (magnetic) material parameters; Kf² = Kf^2
 #                      ) where {K,Kf,Kf²}
-#     p = S²Mat{Kf,Kf²,P}(ntuple(x->0, Val(Kf²)))
+#     p = S²Mat{Kf,Kf²,P}(@SVector(zeros(Int,Kf²)))
 #     for ci = ci_vxl′[1]:ci_vxl′[2]
 #         @inbounds pc = matprm4pind[pind4oind[oind_cmp′[ci]]]
 #         p += inv(pc)

@@ -5,7 +5,7 @@ create_paramop(paramKd::AbsArrNumber,  # material parameter array
                ∆l::NTuple{K,AbsVecNumber},  # line segments to multiply with (defined at field voxel edges); vectors of length N
                ∆l′⁻¹::NTuple{K,AbsVecNumber},  # inverse of line segments to divide by (defined at field voxel corners); vectors of length N
                isbloch::AbsVecBool,  # for K = 3, boundary conditions in x, y, z
-               e⁻ⁱᵏᴸ::AbsVecNumber=ones(K);  # for K = 3, Bloch phase factor in x, y, z
+               e⁻ⁱᵏᴸ::AbsVecNumber=ones(Int,K);  # for K = 3, Bloch phase factor in x, y, z
                cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
                ) where {K} =
     create_paramop(paramKd, SVec{K}(isfwd_in), ∆l, ∆l′⁻¹, SVec{K}(isbloch), SVec{K}(e⁻ⁱᵏᴸ); cmpfirst)
