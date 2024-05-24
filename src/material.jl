@@ -8,7 +8,7 @@ tensorize(m::AbstractMatrix{<:Number}) = SMatrix{3,3}(m)
 
 struct Material
     name::String
-    param::Tuple{SMatrix{3,3,<:Number,9},SMatrix{3,3,<:Number,9}}  # (material parameter interacting with E, and H)
+    param::NTuple{2,SMatrix{3,3,<:Number,9}}  # (material parameter interacting with E, and H)
 end
 
 Material(name::String, param::NTuple{2,AbstractMatParam}) = Material(name, tensorize.(param))
@@ -18,14 +18,26 @@ Material(name::String; ε::AbstractMatParam=1, μ::AbstractMatParam=1) = Materia
 Base.string(m::Material) = m.name
 matparam(m::Material, ft::FieldType) = m.param[Int(ft)]
 
-kottke_avg_param(param1::AbstractMatrix{<:Number}, param2::AbstractMatrix{<:Number}, n12::AbstractVector{<:Real}, rvol1::Real) =
-    (K = length(n12); kottke_avg_param(SMatrix{K,K}(param1), SMatrix{K,K}(param2), SVector{K}(n12), rvol1))
+kottke_avg_param(
+    param1::AbstractMatrix{<:Number},
+    param2::AbstractMatrix{<:Number},
+    n12::AbstractVector{<:Real},
+    rvol1::Real
+) = (
+    K = length(n12);
+    kottke_avg_param(SMatrix{K,K}(param1), SMatrix{K,K}(param2), SVector{K}(n12), rvol1)
+)
 
 # Implement the averaging scheme between two local material parameter tensors developed in
 # the paper by Kottke, Farjadpour, Johnson entitled "Perturbation theory for anisotropic
 # dielectric interfaces, and application to subpixel smoothing of discretized numerical
 # methods", Physical Review E 77 (2008): 036611.
-function kottke_avg_param(param1::SMatrix{K,K,<:Number,K²}, param2::SMatrix{K,K,<:Number,K²}, n12::SVector{K,Float64}, rvol1::Real) where {K,K²}
+function kottke_avg_param(
+    param1::SMatrix{K,K,<:Number,K²},
+    param2::SMatrix{K,K,<:Number,K²},
+    n12::SVector{K,Float64},
+    rvol1::Real
+) where {K,K²}
     @argcheck K² == K^2
     Scomp = @SMatrix rand(K,K-1)  # directions complementary to n12; works even for K = 1
     Stemp = [n12 Scomp]  # SMatrix{K,K}

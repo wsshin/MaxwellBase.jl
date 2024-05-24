@@ -35,9 +35,10 @@ create_field_array(T::Type, N::SVector{<:Any,Int}; ncmp::Int=3) = zeros(T, N...,
 # Initially this function was implemented with PermutedDimsArray() instead of permutedims()
 # to save memory.  However, it turns out that such an implementation returns a vector that
 # is slow on GPU.
-function field_arr2vec(fKd::AbstractArray{<:Number,K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
-                       cmpfirst::Bool=true
-                       ) where {K₊₁}
+function field_arr2vec(
+    fKd::AbstractArray{<:Number,K₊₁};  # field array; K₊₁ = K+1, where K is space dimension and 1 is dimension for Cartesian components
+    cmpfirst::Bool=true
+) where {K₊₁}
     p = cmpfirst ? (K₊₁, 1:(K₊₁-1)...) : tuple(1:K₊₁...)
 
     return reshape(permutedims(fKd,p), :)

@@ -48,24 +48,31 @@ max∆l(obj::Object) = obj.∆lmax
 # We return a vector of submatrices rather than a vector of submatrix views, because
 # assign_param!() requires the entries of its argument matprm4pind to be SMatrix rather than
 # views of SMatrix.
-sub_matprm4pind(matprm4pind::AbstractVector{<:SMatrix{Kf,Kf,<:Number,Kf²}}, inds::SVector{<:Any,<:Integer}) where {Kf,Kf²} =
+sub_matprm4pind(
+    matprm4pind::AbstractVector{<:SMatrix{Kf,Kf,<:Number,Kf²}},
+    inds::SVector{<:Any,<:Integer}
+) where {Kf,Kf²} =
     [mp[inds,inds] for mp = matprm4pind]  # mp[inds,inds]: S²Mat
 
 # Consider using resize! on shp4oind.
-function add_obj!(shp4oind::AbstractVector{Shape{K,K²}}, pind4oind::NTuple{2,AbstractVector{ParamInd}},
-                  matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},
-                  objs::AbstractVector{Object{K,<:Shape{K,K²}}}
-                  ) where {K,K²}
+function add_obj!(
+    shp4oind::AbstractVector{Shape{K,K²}},
+    pind4oind::NTuple{2,AbstractVector{ParamInd}},
+    matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},
+    objs::AbstractVector{Object{K,<:Shape{K,K²}}}
+) where {K,K²}
     for obj = objs
         add_obj!(shp4oind, pind4oind, matprm4pind, obj)
     end
 end
 
 # Consider using resize! on shp4oind.
-function add_obj!(shp4oind::AbstractVector{Shape{K,K²}}, pind4oind::NTuple{2,AbstractVector{ParamInd}},
-                  matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},
-                  objs::Object{K,<:Shape{K,K²}}...
-                  ) where {K,K²}
+function add_obj!(
+    shp4oind::AbstractVector{Shape{K,K²}},
+    pind4oind::NTuple{2,AbstractVector{ParamInd}},
+    matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},
+    objs::Object{K,<:Shape{K,K²}}...
+) where {K,K²}
     for obj = objs
         add_obj!(shp4oind, pind4oind, matprm4pind, obj)
     end
@@ -83,10 +90,12 @@ end
 # Note that matprm4pind stores the same material parameter "value" only once.  Therefore,
 # if two objects are created with different Material instances with the same material
 # parameter tensor, then the two objects' materials are assigned with the same pind.
-function add_obj!(shp4oind::AbstractVector{Shape{K,K²}},  # initially empty vector
-                  pind4oind::NTuple{2,AbstractVector{ParamInd}},  # tuple of initially empty vectors
-                  matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},  # tuple of initially empty vectors
-                  obj::Object{K,<:Shape{K,K²}}) where {K,K²}
+function add_obj!(
+    shp4oind::AbstractVector{Shape{K,K²}},  # initially empty vector
+    pind4oind::NTuple{2,AbstractVector{ParamInd}},  # tuple of initially empty vectors
+    matprm4pind::NTuple{2,AbstractVector{<:SMatrix{3,3,<:Number,9}}},  # tuple of initially empty vectors
+    obj::Object{K,<:Shape{K,K²}}
+) where {K,K²}
     push!(shp4oind, shape(obj))  # append obj (for potential use of obj4oind with KDTree, must use pushfirst! to prepend)
 
     # Assign the material parameter indices to obj.

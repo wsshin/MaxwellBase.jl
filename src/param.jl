@@ -1,19 +1,21 @@
 export create_paramop, apply_paramop!
 
-create_paramop(paramKd::AbstractArray{<:Number},  # material parameter array
-               isfwd_in::AbstractVector{Bool},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
-               ∆l::NTuple{K,AbstractVector{<:Number}},  # line segments to multiply with (defined at field voxel edges); vectors of length N
-               ∆l′⁻¹::NTuple{K,AbstractVector{<:Number}},  # inverse of line segments to divide by (defined at field voxel corners); vectors of length N
-               isbloch::AbstractVector{Bool},  # for K = 3, boundary conditions in x, y, z
-               e⁻ⁱᵏᴸ::AbstractVector{<:Number}=ones(Int,K);  # for K = 3, Bloch phase factor in x, y, z
-               cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
-               ) where {K} =
+create_paramop(
+    paramKd::AbstractArray{<:Number},  # material parameter array
+    isfwd_in::AbstractVector{Bool},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
+    ∆l::NTuple{K,AbstractVector{<:Number}},  # line segments to multiply with (defined at field voxel edges); vectors of length N
+    ∆l′⁻¹::NTuple{K,AbstractVector{<:Number}},  # inverse of line segments to divide by (defined at field voxel corners); vectors of length N
+    isbloch::AbstractVector{Bool},  # for K = 3, boundary conditions in x, y, z
+    e⁻ⁱᵏᴸ::AbstractVector{<:Number}=ones(Int,K);  # for K = 3, Bloch phase factor in x, y, z
+    cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+) where {K} =
     create_paramop(paramKd, SVector{K}(isfwd_in), ∆l, ∆l′⁻¹, SVector{K}(isbloch), SVector{K}(e⁻ⁱᵏᴸ); cmpfirst)
 
 # Version for scalar material parameters
-function create_paramop(paramKd::AbstractArray{<:Number,K₊₂};  # scalar material parameter array
-                        cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
-                        ) where {K₊₂}
+function create_paramop(
+    paramKd::AbstractArray{<:Number,K₊₂};  # scalar material parameter array
+    cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+) where {K₊₂}
     K = K₊₂ - 2
     N = SVector(ntuple(k->size(paramKd,k)-1, Val(K)))  # for -1, see comments about size of paramKd in assignment.jl
     kdiag = 0
@@ -26,14 +28,15 @@ end
 # more explicit.  This also makes the argument list similar to create_mean()'s, which
 # includes N because it allows omitting ∆l and ∆l′ and using ∆l = ∆l′ = ones.((N...,)) as
 # the default arguments.
-function create_paramop(paramKd::AbstractArray{<:Number,K₊₂},  # material parameter array
-                        isfwd_in::SVector{K,Bool},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
-                        ∆l::NTuple{K,AbstractVector{<:Number}},  # line segments to multiply with (defined at field voxel edges); vectors of length N
-                        ∆l′⁻¹::NTuple{K,AbstractVector{<:Number}},  # inverse of line segments to divide by (defined at field voxel corners); vectors of length N
-                        isbloch::SVector{K,Bool},  # for K = 3, boundary conditions in x, y, z
-                        e⁻ⁱᵏᴸ::SVector{K,<:Number};  # for K = 3, Bloch phase factor in x, y, z
-                        cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
-                        ) where {K,K₊₂}
+function create_paramop(
+    paramKd::AbstractArray{<:Number,K₊₂},  # material parameter array
+    isfwd_in::SVector{K,Bool},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
+    ∆l::NTuple{K,AbstractVector{<:Number}},  # line segments to multiply with (defined at field voxel edges); vectors of length N
+    ∆l′⁻¹::NTuple{K,AbstractVector{<:Number}},  # inverse of line segments to divide by (defined at field voxel corners); vectors of length N
+    isbloch::SVector{K,Bool},  # for K = 3, boundary conditions in x, y, z
+    e⁻ⁱᵏᴸ::SVector{K,<:Number};  # for K = 3, Bloch phase factor in x, y, z
+    cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+) where {K,K₊₂}
     @assert K₊₂==K+2
 
     Kf = size(paramKd, K+1)  # field dimension
@@ -137,11 +140,12 @@ end
 # the vw-block, then it is constructed with the vw-component of the material parameter (e.g.,
 # for ε, if X is the xy-block, then it is constructed with εxy).  Therefore, whether the
 # direction of the superdiagonal shift is along the row- or column-direction is not relevant.
-function create_paramop_supdiag(paramKd::AbstractArray{P,K₊₂},  # size of last two dimensions is Kf-by-Kf
-                                kdiag::Integer,  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
-                                N::SVector{K,Int};  # size of grid
-                                cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
-                                ) where {P,K,K₊₂}
+function create_paramop_supdiag(
+    paramKd::AbstractArray{P,K₊₂},  # size of last two dimensions is Kf-by-Kf
+    kdiag::Integer,  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
+    N::SVector{K,Int};  # size of grid
+    cmpfirst::Bool=true  # true to use Cartesian-component-major ordering for more tightly banded matrix
+) where {P,K,K₊₂}
     @assert K₊₂==K+2
 
     Kf = size(paramKd, K+1)  # field dimension
@@ -175,48 +179,51 @@ function create_paramop_supdiag(paramKd::AbstractArray{P,K₊₂},  # size of la
     return sparse(I, J, V, KfM, KfM)
 end
 
-apply_paramop!(G::AbstractArray{<:Number},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
-               F::AbstractArray{<:Number},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
-               G′::AbstractArray{<:Number},  # first temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
-               G′′::AbstractArray{<:Number},  # second temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
-               paramKd::AbstractArray{<:Number},  # material parameter array
-               isfwd_in::AbstractVector{Bool},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
-               ∆l::NTuple{K,AbstractVector{<:Number}},  # line segments to multiply with (defined at field voxel edges); vectors of length N
-               ∆l′⁻¹::NTuple{K,AbstractVector{<:Number}},  # line segments to divide by (defined at field voxel corners); vectors of length N
-               isbloch::AbstractVector{Bool},  # for K = 3, boundary conditions in x, y, z
-               e⁻ⁱᵏᴸ::AbstractVector{<:Number}=ones(1,K);  # for K = 3, Bloch phase factor in x, y, z
-               α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
-               overwrite::Bool=true  # false to add result to output storage G
-               ) where {K} =
-apply_paramop!(G, F, G′, G′′, paramKd, SVector{K}(isfwd_in), ∆l, ∆l′⁻¹, SVector{K}(isbloch), SVector{K}(e⁻ⁱᵏᴸ); α, overwrite)
+apply_paramop!(
+    G::AbstractArray{<:Number},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
+    F::AbstractArray{<:Number},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
+    G′::AbstractArray{<:Number},  # first temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
+    G′′::AbstractArray{<:Number},  # second temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
+    paramKd::AbstractArray{<:Number},  # material parameter array
+    isfwd_in::AbstractVector{Bool},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
+    ∆l::NTuple{K,AbstractVector{<:Number}},  # line segments to multiply with (defined at field voxel edges); vectors of length N
+    ∆l′⁻¹::NTuple{K,AbstractVector{<:Number}},  # line segments to divide by (defined at field voxel corners); vectors of length N
+    isbloch::AbstractVector{Bool},  # for K = 3, boundary conditions in x, y, z
+    e⁻ⁱᵏᴸ::AbstractVector{<:Number}=ones(1,K);  # for K = 3, Bloch phase factor in x, y, z
+    α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+    overwrite::Bool=true  # false to add result to output storage G
+) where {K} =
+    apply_paramop!(G, F, G′, G′′, paramKd, SVector{K}(isfwd_in), ∆l, ∆l′⁻¹, SVector{K}(isbloch), SVector{K}(e⁻ⁱᵏᴸ); α, overwrite)
 
 
 # Version for scalar material parameters
-function apply_paramop!(G::AbstractArray{<:Number,K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
-                        F::AbstractArray{<:Number,K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
-                        paramKd::AbstractArray{<:Number,K₊₂};  # material parameter array
-                        α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
-                        overwrite::Bool=true  # false to add result to output storage G
-                        ) where {K₊₁,K₊₂}
+function apply_paramop!(
+    G::AbstractArray{<:Number,K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
+    F::AbstractArray{<:Number,K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
+    paramKd::AbstractArray{<:Number,K₊₂};  # material parameter array
+    α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+    overwrite::Bool=true  # false to add result to output storage G
+) where {K₊₁,K₊₂}
     kdiag = 0
     apply_paramop_supdiag!(G, F, paramKd, kdiag; α, overwrite)  # diagonal components of material parameter tensor
 
     return nothing
 end
 
-function apply_paramop!(G::AbstractArray{<:Number,K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
-                        F::AbstractArray{<:Number,K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
-                        G′::AbstractArray{<:Number,K₊₁},  # first temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
-                        G′′::AbstractArray{<:Number,K₊₁},  # second temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
-                        paramKd::AbstractArray{<:Number,K₊₂},  # material parameter array
-                        isfwd_in::SVector{K,Bool},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
-                        ∆l::NTuple{K,AbstractVector{<:Number}},  # line segments to multiply with (defined at field voxel edges); vectors of length N
-                        ∆l′⁻¹::NTuple{K,AbstractVector{<:Number}},  # line segments to divide by (defined at field voxel corners); vectors of length N
-                        isbloch::SVector{K,Bool},  # for K = 3, boundary conditions in x, y, z
-                        e⁻ⁱᵏᴸ::SVector{K,<:Number};  # for K = 3, Bloch phase factor in x, y, z
-                        α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
-                        overwrite::Bool=true  # false to add result to output storage G
-                        ) where {K,K₊₁,K₊₂}
+function apply_paramop!(
+    G::AbstractArray{<:Number,K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
+    F::AbstractArray{<:Number,K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
+    G′::AbstractArray{<:Number,K₊₁},  # first temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
+    G′′::AbstractArray{<:Number,K₊₁},  # second temporary storage for intermediate output; in 3D, G′[i,j,k,w] is w-component of G′ at (i,j,k)
+    paramKd::AbstractArray{<:Number,K₊₂},  # material parameter array
+    isfwd_in::SVector{K,Bool},  # isfwd_in[w] = true if w-component of input field is forward-averaged to be interpolated at voxel corners
+    ∆l::NTuple{K,AbstractVector{<:Number}},  # line segments to multiply with (defined at field voxel edges); vectors of length N
+    ∆l′⁻¹::NTuple{K,AbstractVector{<:Number}},  # line segments to divide by (defined at field voxel corners); vectors of length N
+    isbloch::SVector{K,Bool},  # for K = 3, boundary conditions in x, y, z
+    e⁻ⁱᵏᴸ::SVector{K,<:Number};  # for K = 3, Bloch phase factor in x, y, z
+    α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+    overwrite::Bool=true  # false to add result to output storage G
+) where {K,K₊₁,K₊₂}
     @assert K₊₁==K+1 && K₊₂==K+2
 
     Kf = size(paramKd, K+1)  # field dimension
@@ -245,12 +252,14 @@ function apply_paramop!(G::AbstractArray{<:Number,K₊₁},  # output field; in 
 end
 
 # 3D
-function apply_paramop_supdiag!(G::AbstractArray{<:Number,4},  # output field; G[i,j,k,w] is w-component of G at (i,j,k)
-                                F::AbstractArray{<:Number,4},  # input field; F[i,j,k,w] is w-component of F at (i,j,k)
-                                paramKd::AbstractArray{<:Number,5},  # size of last two dimensions is Kf-by-Kf
-                                kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
-                                α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
-                                overwrite::Bool=true)  # false to add result to output storage G
+function apply_paramop_supdiag!(
+    G::AbstractArray{<:Number,4},  # output field; G[i,j,k,w] is w-component of G at (i,j,k)
+    F::AbstractArray{<:Number,4},  # input field; F[i,j,k,w] is w-component of F at (i,j,k)
+    paramKd::AbstractArray{<:Number,5},  # size of last two dimensions is Kf-by-Kf
+    kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
+    α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+    overwrite::Bool=true  # false to add result to output storage G
+)
     Nx, Ny, Nz, Kf = size(G)  # Kf: field dimension
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
@@ -269,12 +278,14 @@ function apply_paramop_supdiag!(G::AbstractArray{<:Number,4},  # output field; G
 end
 
 # 2D
-function apply_paramop_supdiag!(G::AbstractArray{<:Number,3},  # output field; G[i,j,w] is w-component of G at (i,j)
-                                F::AbstractArray{<:Number,3},  # input field; F[i,j,w] is w-component of F at (i,j)
-                                paramKd::AbstractArray{<:Number,4},  # size of last two dimensions is Kf-by-Kf
-                                kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
-                                α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
-                                overwrite::Bool=true)  # false to add result to output storage G
+function apply_paramop_supdiag!(
+    G::AbstractArray{<:Number,3},  # output field; G[i,j,w] is w-component of G at (i,j)
+    F::AbstractArray{<:Number,3},  # input field; F[i,j,w] is w-component of F at (i,j)
+    paramKd::AbstractArray{<:Number,4},  # size of last two dimensions is Kf-by-Kf
+    kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
+    α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+    overwrite::Bool=true  # false to add result to output storage G
+)
     Nx, Ny, Kf = size(G)  # Kf: field dimension
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
@@ -293,12 +304,14 @@ function apply_paramop_supdiag!(G::AbstractArray{<:Number,3},  # output field; G
 end
 
 # 1D
-function apply_paramop_supdiag!(G::AbstractArray{<:Number,2},  # output field; G[i,w] is w-component of G at (i,)
-                                F::AbstractArray{<:Number,2},  # input field; F[i,w] is w-component of F at (i,)
-                                paramKd::AbstractArray{<:Number,3},  # size of last two dimensions is Kf-by-Kf
-                                kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
-                                α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
-                                overwrite::Bool=true)  # false to add result to output storage G
+function apply_paramop_supdiag!(
+    G::AbstractArray{<:Number,2},  # output field; G[i,w] is w-component of G at (i,)
+    F::AbstractArray{<:Number,2},  # input field; F[i,w] is w-component of F at (i,)
+    paramKd::AbstractArray{<:Number,3},  # size of last two dimensions is Kf-by-Kf
+    kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
+    α::Number=1.0,  # scale factor to multiply to result before adding it to G: G += α param F
+    overwrite::Bool=true  # false to add result to output storage G
+)
     Nx, Kf = size(G)  # Kf: field dimension
     @assert size(paramKd)[end] == size(paramKd)[end-1] == Kf
 
@@ -316,18 +329,20 @@ function apply_paramop_supdiag!(G::AbstractArray{<:Number,2},  # output field; G
     return nothing
 end
 
-# function apply_paramop_supdiag!(G::AbstractArray{<:Number,K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
-#                                 F::AbstractArray{<:Number,K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
-#                                 paramKd::AbstractArray{<:Number,K₊₂},  # size of last two dimensions is Kf-by-Kf
-#                                 kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
-#                                 α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
-#                                 overwrite::Bool=true)  # false to add result to output storage G
+# function apply_paramop_supdiag!(
+#     G::AbstractArray{<:Number,K₊₁},  # output field; in 3D, G[i,j,k,w] is w-component of G at (i,j,k)
+#     F::AbstractArray{<:Number,K₊₁},  # input field; in 3D, F[i,j,k,w] is w-component of F at (i,j,k)
+#     paramKd::AbstractArray{<:Number,K₊₂},  # size of last two dimensions is Kf-by-Kf
+#     kdiag::Integer;  # 0 ≤ kdiag ≤ Kf-1; index of diagonal of material parameter tensor to set (kdiag = 0: main diagonal)
+#     α::Number=1.0  # scale factor to multiply to result before adding it to G: G += α param F
+#     overwrite::Bool=true  # false to add result to output storage G
+# )
 #     K = K₊₁ - 1
 #     @assert K₊₂==K+2
-#
+
 #     Kf = size(paramKd, K+1)  # field dimension
 #     @assert size(paramKd,K+2)==Kf
-#
+
 #     overwrite && (G .= 0)
 #     CI = CartesianIndices(size(G)[1:K])
 #     for nv = 1:Kf  # row index of material parameter tensor
@@ -336,6 +351,6 @@ end
 #             @inbounds G[ci,nv] += paramKd[ci,nv,nw] * F[ci,nw]
 #         end
 #     end
-#
+
 #     return nothing
 # end
