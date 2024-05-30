@@ -58,7 +58,7 @@ nout_vxl(::Val{1}) = (SVector(1), SVector(-1))
 # complementary material (i.e., magnetic for electric).
 function smooth_param!(
     paramKd::AbstractArray{P,K₊₂},  # parameter array to smooth at voxel centers
-    oindKd′::NTuple{Kf⏐₁,AbstractArray{ObjInd,K}},  # object index array at voxel corners; does not change
+    oindKd′::NTuple{Kfv̲1,AbstractArray{ObjInd,K}},  # object index array at voxel corners; does not change
     shp4oind::AbstractVector{Shape{K,K²}},  # input map from oind to shape
     pind4oind::AbstractVector{ParamInd},  # input map from oind to pind
     matprm4pind::AbstractVector{SMatrix{Kf,Kf,P,Kf²}},  # map from pind to electric (magnetic) material parameters; Kf² = Kf^2
@@ -68,20 +68,20 @@ function smooth_param!(
     σ::NTuple{2,NTuple{K,AbstractVector{Bool}}},  # false if on symmetry boundary; exclude ghost points (length(σ[PRIM][k]) = N[k])
     ∆τ::NTuple{2,NTuple{K,AbstractVector{<:Real}}},  # amount of shift by Bloch boundary conditions; include ghost points (length(∆τ[PRIM][k]) = N[k]+1)
     isfield˔shp::Bool=isfield_ortho_shape(Kf,K)  # true if spaces where field and shapes are defined are orthogonal complement of each other; false if they are the same
-) where {P,K,K²,K₊₂,Kf,Kf²,Kf⏐₁}
-    @assert K²==K^2 && Kf²==Kf^2 && K₊₂==K+2 && (Kf⏐₁==Kf || Kf⏐₁==1)
+) where {P,K,K²,K₊₂,Kf,Kf²,Kfv̲1}
+    @assert K²==K^2 && Kf²==Kf^2 && K₊₂==K+2 && (Kfv̲1==Kf || Kfv̲1==1)
     @assert size(paramKd,K+1)==size(paramKd,K+2)==Kf
 
     ci_1 = CartesianIndex(@SVector(ones(Int,K))...)
-    for nw = 1:Kf⏐₁
+    for nw = 1:Kfv̲1
         # Set the grid types of the x-, y-, z-locations of Fw.
         #
-        # I thought I could replace the condition Kf⏐₁==1 with isfield_ortho_shape(Kf,K),
+        # I thought I could replace the condition Kfv̲1==1 with isfield_ortho_shape(Kf,K),
         # because gt_cmp becomes gt₀ when isfield_ortho_shape(Kf,K) = true.  The replacement
         # is incorrect, however, because we need gt_cmp to become gt₀ even when the shape
         # and field subspaces coincide (e.g., K = Kf = 3) to assign the off-diagonal entries
         # of the material parameter tensors at voxel corners.
-        gt_cmp = Kf⏐₁==1 ? gt₀ : gt_w(nw, gt₀)
+        gt_cmp = Kfv̲1==1 ? gt₀ : gt_w(nw, gt₀)
 
         # Set the grid types of the voxel corners surroundnig Fw.
         gt_cmp′ = alter.(gt_cmp)
@@ -126,25 +126,25 @@ function smooth_param!(
                         prm_vxl = amean_param(ci_vxl′, oind_cmp′, pind4oind, matprm4pind)::SMatrix{Kf,Kf,P,Kf²}
                     end  # if Nprm_vxl == 2
 
-                    # Below, we have four combinations depending on the values of Kf⏐₁ and Kf:
-                    # Kf⏐₁ is either ==Kf or ==1, and Kf is either ≥2 or ==1.
+                    # Below, we have four combinations depending on the values of Kfv̲1 and Kf:
+                    # Kfv̲1 is either ==Kf or ==1, and Kf is either ≥2 or ==1.
                     #
-                    # The case of Kf⏐₁ == Kf covers Kf≥2 and Kf==1.  When Kf==1, the case
-                    # corresponds to Kf⏐₁==1 and Kf==1.  Therefore, the "if" case Kf⏐₁ == Kf
+                    # The case of Kfv̲1 == Kf covers Kf≥2 and Kf==1.  When Kf==1, the case
+                    # corresponds to Kfv̲1==1 and Kf==1.  Therefore, the "if" case Kfv̲1 == Kf
                     # covers the two combinations:
-                    # - Kf⏐₁==Kf and Kf≥2,
-                    # - Kf⏐₁==1 and Kf==1.
+                    # - Kfv̲1==Kf and Kf≥2,
+                    # - Kfv̲1==1 and Kf==1.
                     #
                     # Therefore, the "else" case should cover the remaining two combinations:
-                    # - Kf⏐₁==Kf && Kf==1,
-                    # - Kf⏐₁==1 && Kf≥2.
-                    # However, the first combination is equivalent to Kf⏐₁==1 && Kf==1, which
+                    # - Kfv̲1==Kf && Kf==1,
+                    # - Kfv̲1==1 && Kf≥2.
+                    # However, the first combination is equivalent to Kfv̲1==1 && Kf==1, which
                     # was already covered in the "if" case.  Therefore, the "else" case
-                    # deals with only the case of Kf⏐₁==1 && Kf≥2.
-                    if Kf⏐₁ == Kf  # Kf⏐₁==Kf && Kf≥2, or Kf⏐₁==1 && Kf==1
+                    # deals with only the case of Kfv̲1==1 && Kf≥2.
+                    if Kfv̲1 == Kf  # Kfv̲1==Kf && Kf≥2, or Kfv̲1==1 && Kf==1
                         # Overwrite the (nw,nw)-diagonal entry of paramKd.
                         @inbounds paramKd[ci_cmp,nw,nw] = prm_vxl[nw,nw]
-                    else  # Kf⏐₁==1 && Kf≥2
+                    else  # Kfv̲1==1 && Kf≥2
                         # Overwrite the off-diagonal entires of paramKd.
                         # Below the main diagonal.
                         for c = 1:Kf, r = c+1:Kf  # column- and row-indices
@@ -155,7 +155,7 @@ function smooth_param!(
                         for c = 2:Kf, r = 1:c-1  # column- and row-indices
                             @inbounds paramKd[ci_cmp,r,c] = prm_vxl[r,c]
                         end
-                    end  # if Kf⏐₁ == 1
+                    end  # if Kfv̲1 == 1
                 end  # if Nprm_vxl ≥ 2
                 # If Nprm_vxl = 1, the voxel is filled with the same material, and there is
                 # no need for subpixel smoothing.
