@@ -25,7 +25,7 @@ function create_paramop(
 end
 
 # Below, N can be retrieved from the size of paramKd or ∆l, but I pass it to make the size
-# more explicit.  This also makes the argument list similar to create_mean()'s, which
+# more explicit.  This also makes the argument list similar to create_line_avg()'s, which
 # includes N because it allows omitting ∆l and ∆l′ and using ∆l = ∆l′ = ones.((N...,)) as
 # the default arguments.
 function create_paramop(
@@ -78,21 +78,21 @@ function create_paramop(
     # - the output E(H)w-field needs to be forward(backward)-averaged in the w-direction.
     isfwd_out = .!isfwd_in  # SVector{K,Bool}; true if output fields need to be backward-averaged
 
-    # For the output averaging, ∆l and ∆l′ are not supplied to create_mean in order to
+    # For the output averaging, ∆l and ∆l′ are not supplied to create_line_avg in order to
     # create a simple arithmetic averaging operator.  This is because the area factor
     # matrix multiplied for symmetry to the left of the material parameter matrix
     # multiplies the same area factor to the two fields being averaged.  (See my notes
     # on Jul/16/2018 in MaxwellFDFD in Agenda.)
-    Mout = create_mean(isfwd_out, N, isbloch, e⁻ⁱᵏᴸ; cmpfirst)
+    Mout = create_line_avg(isfwd_out, N, isbloch, e⁻ⁱᵏᴸ; cmpfirst)
 
-    # For the input averaging, ∆l and ∆l′ are supplied to create_mean in order to create
+    # For the input averaging, ∆l and ∆l′ are supplied to create_line_avg in order to create
     # a line integral averaging operator.  This is because the inverse of the length
     # factor matrix multiplied for symmetry to the right of the material parameter
     # matrix divides the two fields being averaged by different (= nonuniform) line
     # segments.  The ∆l factors multiplied inside create_minfo cancel the effect of this
     # multiplication with the nonuniform line segments.  (See my notes on Jul/16/2018 in
     # MaxwellFDFD in Agenda.)
-    Min = create_mean(isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ; cmpfirst)
+    Min = create_line_avg(isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ; cmpfirst)
 
     # Off-diagonal components of material parameter tensor
     # Min and Mout are block-diagonal matrices, but create_paramop_supdiag() generates
@@ -234,7 +234,7 @@ function apply_paramop!(
 
     isfwd_out = .!isfwd_in  # SVector{K,Bool}; true if output fields need to be backward-averaged
 
-    apply_mean!(G′, F, isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ)
+    apply_line_avg!(G′, F, isfwd_in, ∆l, ∆l′⁻¹, isbloch, e⁻ⁱᵏᴸ)
 
     # Off-diagonal components of material parameter tensor
     kdiag = 1
@@ -242,7 +242,7 @@ function apply_paramop!(
     for kdiag = 2:Kf-1  # index of diagonal of material parameter tensor
         apply_paramop_supdiag!(G′′, G′, paramKd, kdiag, overwrite=false)
     end
-    apply_mean!(G, G′′, isfwd_out, isbloch, e⁻ⁱᵏᴸ; α, overwrite)
+    apply_line_avg!(G, G′′, isfwd_out, isbloch, e⁻ⁱᵏᴸ; α, overwrite)
 
     # Diagonal components of material parameter tensor
     kdiag = 0
