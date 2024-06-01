@@ -21,7 +21,7 @@ mutable struct Object{K,S<:Shape{K}}  # K: dimension of space
     Object{K,S}(shp, mat, ∆lmax) where {K,S} = new(shp, mat, ∆lmax)
 end
 
-Object(shp::S, mat::Material, ∆lmax::SVector{K}=@SVector(fill(Inf,K))) where {K,S<:Shape{K}} =
+Object(shp::S, mat::Material, ∆lmax::SVector{K}=fill(Inf,SVector{K})) where {K,S<:Shape{K}} =
     Object{K,S}(shp, mat, ∆lmax)
 Object(shp::Shape{K}, mat::Material, ∆lmax::AbstractVector) where {K} = Object(shp, mat, SVector{K}(∆lmax))
 Object(shp::Shape{K}, mat::Material, ∆lmax::Real) where {K} = Object(shp, mat, SVector(ntuple(k->∆lmax, Val(K))))

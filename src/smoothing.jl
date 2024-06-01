@@ -72,7 +72,7 @@ function smooth_param!(
     @assert K²==K^2 && Kf²==Kf^2 && K₊₂==K+2 && (Kfv̲1==Kf || Kfv̲1==1)
     @assert size(paramKd,K+1)==size(paramKd,K+2)==Kf
 
-    ci_1 = CartesianIndex(@SVector(ones(Int,K))...)
+    ci_1 = CartesianIndex(ones(SVector{K,Int})...)
     for nw = 1:Kfv̲1
         # Set the grid types of the x-, y-, z-locations of Fw.
         #
@@ -97,7 +97,7 @@ function smooth_param!(
 
         oind_cmp′ = oindKd′[nw]
 
-        ind_c = MArray{Tuple{@SVector(fill(2,K))...},Int}(undef)  # corner indices inside voxel
+        ind_c = MArray{Tuple{fill(2,SVector{K})...},Int}(undef)  # corner indices inside voxel
         pind_vxl′ = similar(ind_c)  # material parameter indices inside voxel
         oind_vxl′ = similar(ind_c)  # object indices inside voxel
 
@@ -234,7 +234,7 @@ function smooth_param_vxl(
     isfield˔shp::Bool=false  # true if spaces where material parameters and shapes are defined are orthogonal complement of each other; false if they are the same
 ) where {TP,P,K,K²,Kf,Kf²,Zᴷ}
     # First, attempt to apply Kottke's subpixel smoothing algorithm.
-    nout = @SVector zeros(K)
+    nout = zeros(SVector{K})
     rvol = 0.0
 
     with2objs = true  # will be updated, because there could be ≥3 objects in voxel even if Nprm_vxl = 2
@@ -304,8 +304,8 @@ function smooth_param_vxl(
         x₀ = t_ind(lcmp, ci_cmp)  # SFloat{3}: location of center of smoothing voxel
         @inbounds lvxl′ = (t_ind(lcmp′,ci_vxl′[1]), t_ind(lcmp′,ci_vxl′[2]))
 
-        @inbounds ci_fg = CartesianIndices(@SVector(fill(2,K)).data)[ind_fg]  # subscritpt of corner ind_fg
-        ci_1 = CartesianIndex(@SVector(ones(Int,K))...)
+        @inbounds ci_fg = CartesianIndices(fill(2,SVector{K}).data)[ind_fg]  # subscritpt of corner ind_fg
+        ci_1 = CartesianIndex(ones(SVector{K,Int})...)
         ∆fg = t_ind(∆τcmp′, ci_cmp + ci_fg - ci_1)  # SFloat{3}; nonzero if corner ind_fg is outside periodic boundary
 
         # See "Overall smoothing algorithm" above.
@@ -341,7 +341,7 @@ function smooth_param_vxl(
 end
 
 function kottke_input_simple(ind_c::MArray{TP,Int,K,Zᴷ}, n_diffp::Integer) where {TP,K,Zᴷ}
-    nout = @SVector zeros(K)  # nout for param_fg
+    nout = zeros(SVector{K})  # nout for param_fg
     for n = n_diffp:Zᴷ  # n = Zᴷ corresponds ind_c[Zᴷ] used for param_fg
         @inbounds nout += nout_vxl(Val(K))[ind_c[n]]
     end
@@ -376,7 +376,7 @@ function amean_param(
     pind4oind::AbstractVector{ParamInd},  # input map from oind to pind
     matprm4pind::AbstractVector{SMatrix{Kf,Kf,P,Kf²}}  # map from pind to electric (magnetic) material parameters; Kf² = Kf^2
 ) where {P,K,Kf,Kf²}
-    p = SMatrix{Kf,Kf,P,Kf²}(@SVector(zeros(Int,Kf²)))
+    p = zeros(SMatrix{Kf,Kf,P})
     for ci = ci_vxl′[1]:ci_vxl′[2]
         @inbounds pc = matprm4pind[pind4oind[oind_cmp′[ci]]]
         p += pc
@@ -390,7 +390,7 @@ end
 #     pind4oind::AbstractVector{ParamInd},  # input map from oind to pind
 #     matprm4pind::AbstractVector{SMatrix{Kf,Kf,P,Kf²}}  # map from pind to electric (magnetic) material parameters; Kf² = Kf^2
 # ) where {K,Kf,Kf²}
-#     p = SMatrix{Kf,Kf,P,Kf²}(@SVector(zeros(Int,Kf²)))
+#     p = zeros(SMatrix{Kf,Kf,P})
 #     for ci = ci_vxl′[1]:ci_vxl′[2]
 #         @inbounds pc = matprm4pind[pind4oind[oind_cmp′[ci]]]
 #         p += inv(pc)

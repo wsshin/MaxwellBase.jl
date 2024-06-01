@@ -2,7 +2,7 @@ export Material
 export matparam, kottke_avg_param
 
 # Note that the output of tensorize is always a matrix: for K = 1, it is a 1×1 matrix.
-tensorize(x::Number) = tensorize(@SVector(fill(x, 3)))  # SComplexF{3}(x,x,x): vector
+tensorize(x::Number) = tensorize(fill(x,SVector{3}))  # SComplexF{3}(x,x,x): vector
 tensorize(v::AbstractVector{<:Number}) = diagm(Val(0)=>SVector{3}(v))
 tensorize(m::AbstractMatrix{<:Number}) = SMatrix{3,3}(m)
 
@@ -39,7 +39,7 @@ function kottke_avg_param(
     rvol1::Real
 ) where {K,K²}
     @argcheck K² == K^2
-    Scomp = @SMatrix rand(K,K-1)  # directions complementary to n12; works even for K = 1
+    Scomp = rand(SMatrix{K,K-1})  # directions complementary to n12; works even for K = 1
     Stemp = [n12 Scomp]  # SMatrix{K,K}
     S = qr(Stemp).Q  # nonallocating; 1st column is normalized n12
 
@@ -94,8 +94,8 @@ end
 
 # function τ_trans(ε::S²ComplexF{K}) where {K}
 #     τ_temp1 = @SMatrix [ε[i,j] for i = 2:K, j = 2:K]  # cannot use type parameter K here: error is generated
-#     τ_temp2 = [@SMatrix(zeros(ComplexF64,1,K-1)); τ_temp1]
-#     τ_temp = [@SVector(zeros(ComplexF64,K)) τ_temp2]
+#     τ_temp2 = [zeros(SMatrix{1,K-1,ComplexF64}); τ_temp1]
+#     τ_temp = [zeros(SVector{K,ComplexF64}) τ_temp2]
 #
 #     σcol_temp = @SVector [ε[i,1] for i = 2:K]
 #     σcol = [SVector{1,ComplexF64}(-1); σcol_temp]
