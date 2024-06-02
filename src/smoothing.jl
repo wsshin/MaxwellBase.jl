@@ -234,7 +234,7 @@ function smooth_param_vxl(
     isfield˔shp::Bool=false  # true if spaces where material parameters and shapes are defined are orthogonal complement of each other; false if they are the same
 ) where {TP,P,K,K²,Kf,Kf²,Zᴷ}
     # First, attempt to apply Kottke's subpixel smoothing algorithm.
-    nout = zeros(SVector{K})
+    nout = zeros(SVector{K,Float64})
     rvol = 0.0
 
     with2objs = true  # will be updated, because there could be ≥3 objects in voxel even if Nprm_vxl = 2
@@ -341,7 +341,7 @@ function smooth_param_vxl(
 end
 
 function kottke_input_simple(ind_c::MArray{TP,Int,K,Zᴷ}, n_diffp::Integer) where {TP,K,Zᴷ}
-    nout = zeros(SVector{K})  # nout for param_fg
+    nout = zeros(SVector{K,Float64})  # nout for param_fg
     for n = n_diffp:Zᴷ  # n = Zᴷ corresponds ind_c[Zᴷ] used for param_fg
         @inbounds nout += nout_vxl(Val(K))[ind_c[n]]
     end
