@@ -30,7 +30,8 @@ struct MaxwellUnit
 
     function MaxwellUnit(L₀)
         # The length unit L₀ is set by users.
-        @argcheck 1L₀ > 0  # L₀ must be positive
+        L₀ = 1L₀
+        @argcheck L₀ > 0  # L₀ must be positive
 
         # The E-field unit is arbitrarily chosen as E₀ = 1 V/m.
         E₀ = 1.0  # E-field is measured in V/m
