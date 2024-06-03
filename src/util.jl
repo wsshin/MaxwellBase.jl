@@ -1,5 +1,8 @@
-export create_∆ls
+export add_cc, add_cc!, create_∆ls
 # import Base:isapprox, dot
+
+add_cc(x) = 2real(x)
+add_cc!(x) = (x .= 2 .* real.(x); return nothing)
 
 # See http://stackoverflow.com/questions/2786899/fastest-sort-of-fixed-length-6-int-array.
 # Generate the swap macros at http://pages.ripco.net/~jgamble/nw.html.
