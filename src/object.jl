@@ -52,7 +52,7 @@ sub_matprm4pind(
     matprm4pind::AbstractVector{<:SMatrix{Kf,Kf,<:Number,Kf²}},
     inds::SVector{<:Any,<:Integer}
 ) where {Kf,Kf²} =
-    [mp[inds,inds] for mp = matprm4pind]  # mp[inds,inds]: S²Mat
+    [mp[inds,inds] for mp = matprm4pind]  # mp[inds,inds]: SMatrix{K,K}
 
 # Consider using resize! on shp4oind.
 function add_obj!(

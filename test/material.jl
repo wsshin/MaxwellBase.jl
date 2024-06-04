@@ -1,9 +1,9 @@
 @testset "material" begin
 
 @testset "tensorize" begin
-    @test MaxwellBase.tensorize(3) === S²Mat{3,9}(3,0,0, 0,3,0, 0,0,3)
-    @test MaxwellBase.tensorize([2,4,6]) === S²Mat{3,9}(2,0,0, 0,4,0, 0,0,6)
-    @test MaxwellBase.tensorize([1 4 7; 2 5 8; 3 6 9]) === S²Mat{3,9}(1,2,3,4,5,6,7,8,9)
+    @test MaxwellBase.tensorize(3) === SMatrix{3,3}(3,0,0, 0,3,0, 0,0,3)
+    @test MaxwellBase.tensorize([2,4,6]) === SMatrix{3,3}(2,0,0, 0,4,0, 0,0,6)
+    @test MaxwellBase.tensorize([1 4 7; 2 5 8; 3 6 9]) === SMatrix{3,3}(1,2,3,4,5,6,7,8,9)
 end
 
 @testset "Material" begin

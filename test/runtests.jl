@@ -1,5 +1,5 @@
 using MaxwellBase
-using AbbreviatedTypes; @define_types_with(Float64)
+using StaticArrays
 using SimpleConstants
 using Test
 using Statistics: mean

@@ -28,8 +28,8 @@
     shp4oind = Shape3[]
     εind4oind = ParamInd[]
     μind4oind = ParamInd[]
-    ε4εind = S²ComplexF{3,9}[]
-    μ4μind = S²ComplexF{3,9}[]
+    ε4εind = SMatrix{3,3,ComplexF64,9}[]
+    μ4μind = SMatrix{3,3,ComplexF64,9}[]
 
     add_obj!(shp4oind, (εind4oind,μind4oind), (ε4εind,μ4μind), dom_vac, obj_diel)
 
@@ -153,8 +153,8 @@ end  # @testset "smoothing, box with odd number of voxels"
     shp4oind = Shape3[]
     εind4oind = ParamInd[]
     μind4oind = ParamInd[]
-    ε4εind = S²ComplexF{3,9}[]
-    μ4μind = S²ComplexF{3,9}[]
+    ε4εind = SMatrix{3,3,ComplexF64,9}[]
+    μ4μind = SMatrix{3,3,ComplexF64,9}[]
 
     add_obj!(shp4oind, (εind4oind,μind4oind), (ε4εind,μ4μind), dom_vac, obj_diel)
 

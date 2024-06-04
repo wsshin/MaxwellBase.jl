@@ -92,7 +92,7 @@ end
 
 τ_trans(ε::SMatrix{1,1,<:Number}) = -1 ./ ε  # SMatrix{1,1,<:Number}
 
-# function τ_trans(ε::S²ComplexF{K}) where {K}
+# function τ_trans(ε::SMatrix{K,K,ComplexF64}) where {K}
 #     τ_temp1 = @SMatrix [ε[i,j] for i = 2:K, j = 2:K]  # cannot use type parameter K here: error is generated
 #     τ_temp2 = [zeros(SMatrix{1,K-1,ComplexF64}); τ_temp1]
 #     τ_temp = [zeros(SVector{K,ComplexF64}) τ_temp2]

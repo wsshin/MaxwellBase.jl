@@ -341,9 +341,9 @@ assign_param_cmp!(
     assign_param_cmp_impl!(param_cmp, oind′_cmp, shp4oind, pind4oind, matprm4pind, τlcmp)
 
 # For Kfv̲1 == 1.
-# Below, note that the element type of pint2matprm, S²ComplexF{Kf,Kf²}, is always a matrix
+# Below, note that the element type of pint2matprm, SMatrix{Kf,Kf,ComplexF64,Kf²}, is always a matrix
 # (i.e., rank-2 tensor), regardless of the value of Kf.  For example, if we are assigning μz
-# in a 2D TE problem, μz is a type of S²ComplexF{1,1}.  This is why K₊₂ is K + 2 regardless
+# in a 2D TE problem, μz is a type of SMatrix{1,1,ComplexF64,1}.  This is why K₊₂ is K + 2 regardless
 # of the value of Kf, where 2 is the rank of the material parameter tensor.
 assign_param_cmp!(
     param_cmp::AbstractArray{P,K₊₂},  # output material parameter array (array of tensors); M = K+2
