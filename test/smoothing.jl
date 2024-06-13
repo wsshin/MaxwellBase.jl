@@ -382,10 +382,10 @@ end  # @testset "smoothing, box with even number of voxels"
 #
 #     # Create materials.
 #     εvac = 1.0
-#     vac = EncodedMaterial(PRIM, Material("Vacuum", ε=εvac))
+#     vac = EncodedMaterial(PrimalGrid(), Material("Vacuum", ε=εvac))
 #
 #     εdiel = 2.0
-#     diel = EncodedMaterial(PRIM, Material("Dielectric", ε=εdiel))
+#     diel = EncodedMaterial(PrimalGrid(), Material("Dielectric", ε=εdiel))
 #
 #     # Create objects.
 #     dom_vac = Object(Cuboid(g3.bounds), vac)

@@ -18,7 +18,7 @@ end  # @testset "Object"
 # @testset "periodize" begin
 #     # Square lattice
 #     Si = Material("Si", ε = 12)
-#     gtₑ = PRIM
+#     gtₑ = PrimalGrid()
 #     eSi = EncodedMaterial(gtₑ, Si)
 #     c_eSi = Object(Cylinder([0,0,0], 1, 5, [0,0,1]), eSi)
 #
@@ -28,7 +28,7 @@ end  # @testset "Object"
 #
 #     @test length(obj_array) == 11^2
 #     @test all(map(x->(x==max∆l(c_eSi)), max∆l.(obj_array)))
-#     @test all(map(x->(x==matparam(c_eSi,PRIM)), matparam.(obj_array,PRIM)))
+#     @test all(map(x->(x==matparam(c_eSi,PrimalGrid())), matparam.(obj_array,PrimalGrid())))
 #     @test all(map(x->(x==matparam(c_eSi,DUAL)), matparam.(obj_array,DUAL)))
 #
 #     obj4oind = Object{3}[]

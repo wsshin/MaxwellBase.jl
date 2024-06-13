@@ -21,10 +21,10 @@ end
 end
 
 @testset "ft2gt" begin
-    @test MaxwellBase.ft2gt(EE,EE) == PRIM
+    @test MaxwellBase.ft2gt(EE,EE) == PrimalGrid()
     @test MaxwellBase.ft2gt(HH,EE) == DUAL
     @test MaxwellBase.ft2gt(EE,HH) == DUAL
-    @test MaxwellBase.ft2gt(HH,HH) == PRIM
+    @test MaxwellBase.ft2gt(HH,HH) == PrimalGrid()
 end
 
 end  # @testset "enumtype"

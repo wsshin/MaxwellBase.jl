@@ -135,7 +135,7 @@ end
 # # distance to the boundary.  If I want to get 0 for internal points, compare
 # # dist(l,c) = (distance between l and center), and if it is less than L_(i) / 2,
 # # return zero; otherwise return dist(l,c).
-# @inline dist2bound(i::Interval1D, l::Real) = (a1 = abs(i.bound[nN]-l)) < (a2 = abs(i.bound[nP]-l)) ? a1 : a2
+# @inline dist2bound(i::Interval1D, l::Real) = (a1 = abs(i.bound[LowerBound()]-l)) < (a2 = abs(i.bound[UpperBound()]-l)) ? a1 : a2
 
 # # Functions common to all Shape's
 #
@@ -148,7 +148,7 @@ end
 # # Other functions
 # @inline bound_(s::Shape) = bound_(s.cbox)
 # @inline bound_(s::Shape, w::Axis) = bound_(s.cbox, w)
-# @inline bound_(s::Shape, w::Axis, sn::Sign) = bound_(s.cbox, w, sn)
+# @inline bound_(s::Shape, w::Axis, bt::AbstractBoundType) = bound_(s.cbox, w, bt)
 # @inline bound_contains(s::Shape, l::NTuple{3,Real}, isinclusive::Bool=true) = contains(s.cbox, l, isinclusive)
 # @inline L_(s::Shape) = L_(s.cbox)  # scalar
 # @inline center_(s::Shape) = center_(s.cbox)  # scalar
@@ -183,8 +183,8 @@ end
 #     # println("r = $r, vxl = $vxl")
 #     α = 5e-4  # 1e-3 / 2
 #
-#     ∆x, ∆y, ∆z = α * (vxl[nX][nP] - vxl[nX][nN]), α * (vxl[nY][nP] - vxl[nY][nN]), α * (vxl[nZ][nP] - vxl[nZ][nN])
-#     # ∆x, ∆y, ∆z = α .* (t_ind(vxl, nP, nP, nP) .- t_ind(vxl, nN, nN, nN))
+#     ∆x, ∆y, ∆z = α * (vxl[nX][UpperBound()] - vxl[nX][LowerBound()]), α * (vxl[nY][UpperBound()] - vxl[nY][LowerBound()]), α * (vxl[nZ][UpperBound()] - vxl[nZ][LowerBound()])
+#     # ∆x, ∆y, ∆z = α .* (t_ind(vxl, UpperBound(), UpperBound(), UpperBound()) .- t_ind(vxl, LowerBound(), LowerBound(), LowerBound()))
 #     rx, ry, rz = r
 #
 #     # println("(∆x, ∆y, ∆z) = $((∆x, ∆y, ∆z))")
