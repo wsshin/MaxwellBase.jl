@@ -11,7 +11,7 @@
 
         @test shape(box_mat) == Cuboid(b)
         @test max∆l(box_mat) == fill(Inf,3)
-        @test matparam(box_mat,EE)==mat.param[nE] && matparam(box_mat,HH)==mat.param[nH]
+        @test matparam(box_mat,Efield())==mat.param[Efield()] && matparam(box_mat,Hfield())==mat.param[Hfield()]
     end  # @testset "Cuboid"
 end  # @testset "Object"
 

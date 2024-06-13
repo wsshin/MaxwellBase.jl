@@ -32,7 +32,7 @@ Object(shp::Shape{K}, mat::Material, ∆lmax::Real) where {K} = Object(shp, mat,
 # setmax∆l!(obj::Object{K}, ∆lmax::Number) where {K} = setmax∆l!(obj, SVector(ntuple(k->∆lmax, Val(K))))
 
 shape(obj::Object) = obj.shp
-matparam(obj::Object, ft::FieldType) = matparam(obj.mat, ft)
+matparam(obj::Object, ft::AbstractFieldType) = matparam(obj.mat, ft)
 max∆l(obj::Object) = obj.∆lmax
 
 # Relationships between matprm4pind, pind4oind, shp4oind

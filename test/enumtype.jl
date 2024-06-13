@@ -1,30 +1,19 @@
 @testset "enumtype" begin
 
 @testset "instances" begin
-    @test instances(FieldType) == (EE, HH)
+    @test instances(AbstractFieldType) == (Efield(), Hfield())
 end
 
-@testset "numel" begin
-    @test numel(FieldType) == 2
-end
-
-@testset "integers" begin
-    @test Int.(SVector(instances(FieldType))) == nEH == [nE, nH]
-end
-
-@testset "alter" begin
-    @test alter(EE) == HH
-    @test alter(HH) == EE
-
-    @test alter(nE) == nH
-    @test alter(nH) == nE
+@testset "conj" begin
+    @test conj(Efield()) == Hfield()
+    @test conj(Hfield()) == Efield()
 end
 
 @testset "ft2gt" begin
-    @test MaxwellBase.ft2gt(EE,EE) == PrimalGrid()
-    @test MaxwellBase.ft2gt(HH,EE) == DUAL
-    @test MaxwellBase.ft2gt(EE,HH) == DUAL
-    @test MaxwellBase.ft2gt(HH,HH) == PrimalGrid()
+    @test MaxwellBase.ft2gt(Efield(),Efield()) == PrimalGrid()
+    @test MaxwellBase.ft2gt(Hfield(),Efield()) == DualGrid()
+    @test MaxwellBase.ft2gt(Efield(),Hfield()) == DualGrid()
+    @test MaxwellBase.ft2gt(Hfield(),Hfield()) == PrimalGrid()
 end
 
 end  # @testset "enumtype"

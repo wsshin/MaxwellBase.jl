@@ -47,17 +47,17 @@
     oind3d_μzz = create_oind_array(N)
     oind3d_μoo = create_oind_array(N)
 
-    boundft = SVector(EE,EE,EE)
-    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
+    boundft = SVector(Efield(),Efield(),Efield())
+    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
 
     # To-do: test the sanity of the assigned param3d here.  It is relatively easy, and it was very helpful.
 
     # Perform smoothing.
-    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
-    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
 
     ε3dred = view(ε3d, 1:N[1], 1:N[2], 1:N[3], 1:3, 1:3)
 
@@ -172,17 +172,17 @@ end  # @testset "smoothing, box with odd number of voxels"
     oind3d_μzz = create_oind_array(N)
     oind3d_μoo = create_oind_array(N)
 
-    boundft = SVector(EE,EE,EE)
-    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(HH,boundft), g3.ghosted.τlg, g3.isbloch)
+    boundft = SVector(Efield(),Efield(),Efield())
+    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
 
     # To-do: test the sanity of the assigned param3d here.  It is relatively easy, and it was very helpful.
 
     # Perform smoothing.
-    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
-    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
 
     ε3dred = view(ε3d, 1:N[1], 1:N[2], 1:N[3], 1:3, 1:3)
 

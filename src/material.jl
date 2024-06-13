@@ -16,7 +16,7 @@ Material(name::String; ε::AbstractMatParam=1, μ::AbstractMatParam=1) = Materia
 # Consider implementing Material2 and Material3 for 2D and 3D solvers.
 
 Base.string(m::Material) = m.name
-matparam(m::Material, ft::FieldType) = m.param[Int(ft)]
+matparam(m::Material, ft::AbstractFieldType) = m.param[ft]
 
 kottke_avg_param(
     param1::AbstractMatrix{<:Number},
