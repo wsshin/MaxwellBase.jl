@@ -1,18 +1,33 @@
-export FieldType  # types
-export EH, nE, nH, nEH  # instances
+export AbstractFieldType, Efield,Hfield
+
 export ft2gt  # functions
 
-# Field types
-const nE, nH = 1, 2  # E-, H-fields
-const nEH = SVector(nE, nH)
-@enum FieldType EE=nE HH
-const EH = SVector(EE, HH)
-for ins in instances(FieldType); @eval export $(Symbol(ins)); end  # export all instances
-Base.string(ins::FieldType) = ins==EE ? "E" : "H"
-StaggeredGridCalculus.alter(ins::FieldType) = ins==EE ? HH : EE
+abstract type AbstractFieldType end
+show(io::IO, ::MIME"text/plain", ft::AbstractFieldType) = show(io, ft)
+
+struct Efield <: AbstractFieldType end
+show(io::IO, ::Efield) = print(io, "E-field")
+
+getindex(A::Tuple, ::Efield) = first(A)
+getindex(A::AbstractVector, ::Efield) = first(A)
+setindex!(A, a, ::Efield) = setindex!(A, a, firstindex(A))  # (A[begin] = a; A)
+
+conj(::Efield) = Hfield()
+
+struct Hfield <: AbstractFieldType end
+show(io::IO, ::Hfield) = print(io, "H-field")
+
+getindex(A::Tuple, ::Hfield) = last(A)
+getindex(A::AbstractVector, ::Hfield) = last(A)
+setindex!(A, a, ::Hfield) = setindex!(A, a, lastindex(A))  # (A[end] = a; A)
+
+conj(::Hfield) = Efield()
+
+instances(::Type{AbstractFieldType}) = (Efield(), Hfield())
+
 
 # Given boundary field types, determine whether the grid planes specified by the given field
 # type ft are primal or dual grid planes in the Cartesian directions.
 # Note that the boundary field type is the type of the fields tangential to the boundary.
 # The fields defined on but normal to the boundary have the complementary type.
-ft2gt(ft::FieldType, boundft::FieldType) = PD[2 - (boundft==ft)]
+ft2gt(ft::AbstractFieldType, boundft::AbstractFieldType) = (ft==boundft ? PrimalGrid() : DualGrid())
