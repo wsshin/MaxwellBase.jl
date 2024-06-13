@@ -1,6 +1,6 @@
 export AbstractFieldType, Efield,Hfield
 
-export ft2gt  # functions
+export gt4ft  # functions
 
 abstract type AbstractFieldType end
 show(io::IO, ::MIME"text/plain", ft::AbstractFieldType) = show(io, ft)
@@ -30,4 +30,4 @@ instances(::Type{AbstractFieldType}) = (Efield(), Hfield())
 # type ft are primal or dual grid planes in the Cartesian directions.
 # Note that the boundary field type is the type of the fields tangential to the boundary.
 # The fields defined on but normal to the boundary have the complementary type.
-ft2gt(ft::AbstractFieldType, boundft::AbstractFieldType) = (ft==boundft ? PrimalGrid() : DualGrid())
+gt4ft(ft::AbstractFieldType, boundft::AbstractFieldType) = (ft==boundft ? PrimalGrid() : DualGrid())

@@ -63,8 +63,8 @@ function create_∆ls(grid::Grid{K}, boundft::SVector{K,AbstractFieldType}) wher
     ∆l = grid.∆l
     ∆l⁻¹ = invert_∆l(∆l)
 
-    gtₑ = ft2gt.(Efield(), boundft)
-    gtₘ = ft2gt.(Hfield(), boundft)
+    gtₑ = gt4ft.(Efield(), boundft)
+    gtₘ = gt4ft.(Hfield(), boundft)
 
     ∆lₑ = t_ind(∆l, gtₑ)  # ∆l's centered at E-field plane locations
     ∆lₘ = t_ind(∆l, gtₘ)  # ∆l's centered at H-field plane locations

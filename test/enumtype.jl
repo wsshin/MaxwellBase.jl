@@ -9,11 +9,11 @@ end
     @test conj(Hfield()) == Efield()
 end
 
-@testset "ft2gt" begin
-    @test MaxwellBase.ft2gt(Efield(),Efield()) == PrimalGrid()
-    @test MaxwellBase.ft2gt(Hfield(),Efield()) == DualGrid()
-    @test MaxwellBase.ft2gt(Efield(),Hfield()) == DualGrid()
-    @test MaxwellBase.ft2gt(Hfield(),Hfield()) == PrimalGrid()
+@testset "gt4ft" begin
+    @test MaxwellBase.gt4ft(Efield(),Efield()) == PrimalGrid()
+    @test MaxwellBase.gt4ft(Hfield(),Efield()) == DualGrid()
+    @test MaxwellBase.gt4ft(Efield(),Hfield()) == DualGrid()
+    @test MaxwellBase.gt4ft(Hfield(),Hfield()) == PrimalGrid()
 end
 
 end  # @testset "enumtype"

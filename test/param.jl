@@ -45,14 +45,14 @@
     oind3d_μoo = create_oind_array(N)
 
     boundft = SVector(Efield(),Efield(),Efield())
-    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, gt4ft.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, gt4ft.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, gt4ft.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, gt4ft.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
 
     # Perform smoothing.
-    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
-    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, gt4ft.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, gt4ft.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
 
     ∆l = g3.∆l[DualGrid()]
     ∆l′ = g3.∆l[PrimalGrid()]
@@ -111,14 +111,14 @@ end  # @testset "create_paramop"
     oind3d_μoo = create_oind_array(N)
 
     boundft = SVector(Efield(),Efield(),Efield())
-    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, ft2gt.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
-    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, ft2gt.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(ε3d, (oind3d_μxx,oind3d_μyy,oind3d_μzz), shp4oind, εind4oind, ε4εind, gt4ft.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(ε3d, tuple(oind3d_μoo), shp4oind, εind4oind, ε4εind, gt4ft.(Efield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, μind4oind, μ4μind, gt4ft.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
+    assign_param!(μ3d, tuple(oind3d_εoo), shp4oind, μind4oind, μ4μind, gt4ft.(Hfield(),boundft), g3.ghosted.τlg, g3.isbloch)
 
     # Perform smoothing.
-    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
-    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, gt4ft.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
+    smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, gt4ft.(Efield(),boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
 
     ∆l = g3.∆l[DualGrid()]
     ∆l′ = g3.∆l[PrimalGrid()]
