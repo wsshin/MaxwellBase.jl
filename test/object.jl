@@ -29,7 +29,7 @@ end  # @testset "Object"
 #     @test length(obj_array) == 11^2
 #     @test all(map(x->(x==max∆l(c_eSi)), max∆l.(obj_array)))
 #     @test all(map(x->(x==matparam(c_eSi,PrimalGrid())), matparam.(obj_array,PrimalGrid())))
-#     @test all(map(x->(x==matparam(c_eSi,DUAL)), matparam.(obj_array,DUAL)))
+#     @test all(map(x->(x==matparam(c_eSi,DualGrid())), matparam.(obj_array,DualGrid())))
 #
 #     obj4oind = Object{3}[]
 #     matprm4pind = (S²ComplexF3[], S²ComplexF3[])

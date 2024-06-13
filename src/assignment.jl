@@ -230,7 +230,7 @@ function assign_param!(
     # must be circshifted to left in order to be sorted.
     # - symmetry: ghost points copy the values of non-ghost points at the negative end, so τl is
     # already sorted.
-    @inbounds M = length.(τl[nPR])  # NTuple{K,Int}: N.+1
+    @inbounds M = length.(τl[PrimalGrid()])  # NTuple{K,Int}: N.+1
     sub = (map((m,b)->circshift(1:m,b), M, isbloch.data),  # NTuple{K,Vector{Int}}: primal grid
            map((m,b)->circshift(1:m,-b), M, isbloch.data))  # NTuple{K,Vector{Int}}: dual grid
 

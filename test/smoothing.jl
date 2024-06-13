@@ -406,7 +406,7 @@ end  # @testset "smoothing, box with even number of voxels"
 #     assign_param!(param3d, obj3d, pind3d, oind3d, ovec, g3.ghosted.τl, g3.isbloch)
 #     smooth_param!(param3d, obj3d, pind3d, oind3d, g3.l, g3.ghosted.l, g3.σ, g3.ghosted.∆τ)
 #
-#     ε3d = view(param3d[nPR], 1:N[nX], 1:N[nY], 1:N[nZ], 1:3, 1:3)
+#     ε3d = view(param3d[PrimalGrid()], 1:N[nX], 1:N[nY], 1:N[nZ], 1:3, 1:3)
 #
 #     # Construct an expected ε3d.
 #     ε3dexp = Array{ComplexF64}(undef,4,4,4,3,3)

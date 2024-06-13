@@ -54,8 +54,8 @@
     smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
     smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
 
-    ∆l = g3.∆l[nDL]
-    ∆l′ = g3.∆l[nPR]
+    ∆l = g3.∆l[DualGrid()]
+    ∆l′ = g3.∆l[PrimalGrid()]
     ∆l′⁻¹ = map(x->inv.(x), ∆l′)
 
     Mε = create_paramop(ε3d, boundft.!=EE, ∆l, ∆l′⁻¹, g3.isbloch, cmpfirst=true)
@@ -120,15 +120,15 @@ end  # @testset "create_paramop"
     smooth_param!(ε3d, (oind3d_εxx,oind3d_εyy,oind3d_εzz), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
     smooth_param!(ε3d, tuple(oind3d_εoo), shp4oind, εind4oind, ε4εind, ft2gt.(EE,boundft), g3.l, g3.ghosted.lg, g3.σ, g3.ghosted.∆τ)
 
-    ∆l = g3.∆l[nDL]
-    ∆l′ = g3.∆l[nPR]
+    ∆l = g3.∆l[DualGrid()]
+    ∆l′ = g3.∆l[PrimalGrid()]
     ∆l′⁻¹ = map(x->inv.(x), ∆l′)
 
     Mε = create_paramop(ε3d, boundft.!=EE, ∆l, ∆l′⁻¹, g3.isbloch, cmpfirst=true)
 
     # Ml
-    ∆lprim = g3.∆l[nPR]
-    ∆ldual = g3.∆l[nDL]
+    ∆lprim = g3.∆l[PrimalGrid()]
+    ∆ldual = g3.∆l[DualGrid()]
 
     Nx, Ny, Nz = N
     nX, nY, nZ = 1, 2, 3
