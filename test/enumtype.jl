@@ -2,12 +2,10 @@
 
 @testset "instances" begin
     @test instances(FieldType) == (EE, HH)
-    @test instances(BC) == (PERIODIC, CONDUCTING)
 end
 
 @testset "numel" begin
     @test numel(FieldType) == 2
-    @test numel(BC) == 2
 end
 
 @testset "integers" begin

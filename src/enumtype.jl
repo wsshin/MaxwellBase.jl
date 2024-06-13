@@ -1,4 +1,4 @@
-export FieldType, BC  # types
+export FieldType  # types
 export EH, nE, nH, nEH  # instances
 export ft2gt  # functions
 
@@ -16,8 +16,3 @@ StaggeredGridCalculus.alter(ins::FieldType) = ins==EE ? HH : EE
 # Note that the boundary field type is the type of the fields tangential to the boundary.
 # The fields defined on but normal to the boundary have the complementary type.
 ft2gt(ft::FieldType, boundft::FieldType) = PD[2 - (boundft==ft)]
-
-# Boundary conditions
-@enum BC PERIODIC=1 CONDUCTING  # periodic boundary condition, perfect conductor boundary condition
-for ins in instances(BC); @eval export $(Symbol(ins)); end  # export all instances
-Base.string(ins::BC) = ins==PERIODIC ? "periodic" : "perfect conductor"
