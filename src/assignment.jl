@@ -269,7 +269,7 @@ function assign_param!(
         # is incorrect, however, because we need gt_cmp to become gt₀ even when the shape
         # and field subspaces coincide (e.g., K = Kf = 3) to assign the off-diagonal entries
         # of the material parameter tensors at voxel corners.
-        gt_cmp = Kfv̲1==1 ? gt₀ : gt_w(nw, gt₀)
+        gt_cmp = Kfv̲1==1 ? gt₀ : gt4Fw(nw, gt₀)
 
         # Choose the circularly shifted subscripts to use.
         sub_cmp = t_ind(sub, gt_cmp)  # NTuple{K,Vector{Int}}
