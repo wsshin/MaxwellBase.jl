@@ -101,10 +101,8 @@ function add_obj!(
     # Assign the material parameter indices to obj.
     # If the material is aleady used in some object that was previously added, then use the
     # index already assigned to that material.
-    for ft = EH
-        nft = Int(ft)
-
-        mp, on2pn, pn2mp = matparam(obj,ft), pind4oind[nft], matprm4pind[nft]
+    for ft = instances(AbstractFieldType)
+        mp, on2pn, pn2mp = matparam(obj,ft), pind4oind[ft], matprm4pind[ft]
         pind = findlast(x -> x==mp, pn2mp)  # number if mp is already in pn2mp
         pind===nothing && (push!(pn2mp, mp); pind = length(pn2mp))  # update pind if mp is not in pn2mp
         push!(on2pn, pind)
