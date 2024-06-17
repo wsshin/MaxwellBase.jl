@@ -4,6 +4,7 @@ export gt4ft  # functions
 
 abstract type AbstractFieldType end
 show(io::IO, ::MIME"text/plain", ft::AbstractFieldType) = show(io, ft)
+broadcastable(ft::AbstractFieldType) = Ref(ft)
 
 struct Efield <: AbstractFieldType end
 show(io::IO, ::Efield) = print(io, "E-field")

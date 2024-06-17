@@ -10,7 +10,7 @@ using Base.Threads: @threads  # used in param.jl
 using SimpleConstants
 using ArgCheck
 
-import Base: show, getindex, setindex!, conj, instances
+import Base: show, broadcastable, getindex, setindex!, conj, instances
 
 export AbstractMatParam, ParamInd, ObjInd
 
