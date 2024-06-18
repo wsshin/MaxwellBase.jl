@@ -301,12 +301,12 @@ function smooth_param_vxl(
     else  # two objects
         # When Nprm_vxl == Nobj_vxl == 2, different material parameters must correspond
         # to different objects.
-        x₀ = SVector(getindex.(lcmp, ci_cmp.I))  # SFloat{3}: location of center of smoothing voxel
+        x₀ = SVector(getindex.(lcmp, ci_cmp.I))  # SVector{3,Float64}: location of center of smoothing voxel
         @inbounds lvxl′ = (SVector(getindex.(lcmp′,ci_vxl′[1].I)), SVector(getindex.(lcmp′,ci_vxl′[2].I)))
 
         @inbounds ci_fg = CartesianIndices(fill(2,SVector{K}).data)[ind_fg]  # subscritpt of corner ind_fg
         ci_1 = CartesianIndex(ones(SVector{K,Int})...)
-        ∆fg = SVector(getindex.(∆τcmp′, (ci_cmp + ci_fg - ci_1).I))  # SFloat{3}; nonzero if corner ind_fg is outside periodic boundary
+        ∆fg = SVector(getindex.(∆τcmp′, (ci_cmp + ci_fg - ci_1).I))  # SVector{3,Float64}; nonzero if corner ind_fg is outside periodic boundary
 
         # See "Overall smoothing algorithm" above.
         nout, rvol = kottke_input_accurate(x₀, σvxl, lvxl′, ∆fg, shp_fg)::Tuple{SVector{K,Float64},Float64}
