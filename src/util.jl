@@ -59,7 +59,7 @@ isuniform(mv::MArray{Tuple{2,2,2},<:Any,3,8}) = @inbounds (mv[1]==mv[2]==mv[3]==
 isuniform(mv::MArray{Tuple{2,2},<:Any,2,4}) = @inbounds (mv[1]==mv[2]==mv[3]==mv[4])
 isuniform(mv::MArray{Tuple{2},<:Any,1,2}) = @inbounds (mv[1]==mv[2])
 
-function create_∆ls(grid::Grid{K}, boundft::SVector{K,AbstractFieldType}) where {K}
+function create_∆ls(grid::Grid{K}, boundft::SVector{K,<:AbstractFieldType}) where {K}
     ∆l = grid.∆l
     ∆l⁻¹ = invert_∆l(∆l)
 
