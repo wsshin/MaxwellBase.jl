@@ -84,7 +84,7 @@ function smooth_param!(
         gt_cmp = Kfv̲1==1 ? gt₀ : gt4Fw(nw, gt₀)
 
         # Set the grid types of the voxel corners surroundnig Fw.
-        gt_cmp′ = alter.(gt_cmp)
+        gt_cmp′ = conj.(gt_cmp)
 
         # Choose various vectors for Fw (which is at the centers of the voxel defined by the
         # voxel corners below).
