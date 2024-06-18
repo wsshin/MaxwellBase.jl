@@ -88,12 +88,12 @@ function smooth_param!(
 
         # Choose various vectors for Fw (which is at the centers of the voxel defined by the
         # voxel corners below).
-        lcmp = t_ind(l, gt_cmp)
-        σcmp = t_ind(σ, gt_cmp)
+        lcmp = getindex_col(l, gt_cmp)
+        σcmp = getindex_col(σ, gt_cmp)
 
         # Choose various arrays and vectors for voxel corners.
-        lcmp′ = t_ind(lg, gt_cmp′)
-        ∆τcmp′ = t_ind(∆τ, gt_cmp′)
+        lcmp′ = getindex_col(lg, gt_cmp′)
+        ∆τcmp′ = getindex_col(∆τ, gt_cmp′)
 
         oind_cmp′ = oindKd′[nw]
 
@@ -292,7 +292,7 @@ function smooth_param_vxl(
     # - nout (outward normal of the foreground object), and
     # - rvol (volume fraction of the foreground object inside the voxel).
     ci_cmp = ci_vxl′[1]  # CartesianIndex{K}
-    σvxl = t_ind(σcmp, ci_cmp)
+    σvxl = SVector(getindex.(σcmp, ci_cmp.I))
     if !with2objs  # two material parameters but more than two objects in voxel
         # In this case, the interface between two materials is not defined by the
         # surface of a single object, so we estimate nout simply from the locations of
@@ -301,12 +301,12 @@ function smooth_param_vxl(
     else  # two objects
         # When Nprm_vxl == Nobj_vxl == 2, different material parameters must correspond
         # to different objects.
-        x₀ = t_ind(lcmp, ci_cmp)  # SFloat{3}: location of center of smoothing voxel
-        @inbounds lvxl′ = (t_ind(lcmp′,ci_vxl′[1]), t_ind(lcmp′,ci_vxl′[2]))
+        x₀ = SVector(getindex.(lcmp, ci_cmp.I))  # SFloat{3}: location of center of smoothing voxel
+        @inbounds lvxl′ = (SVector(getindex.(lcmp′,ci_vxl′[1].I)), SVector(getindex.(lcmp′,ci_vxl′[2].I)))
 
         @inbounds ci_fg = CartesianIndices(fill(2,SVector{K}).data)[ind_fg]  # subscritpt of corner ind_fg
         ci_1 = CartesianIndex(ones(SVector{K,Int})...)
-        ∆fg = t_ind(∆τcmp′, ci_cmp + ci_fg - ci_1)  # SFloat{3}; nonzero if corner ind_fg is outside periodic boundary
+        ∆fg = SVector(getindex.(∆τcmp′, (ci_cmp + ci_fg - ci_1).I))  # SFloat{3}; nonzero if corner ind_fg is outside periodic boundary
 
         # See "Overall smoothing algorithm" above.
         nout, rvol = kottke_input_accurate(x₀, σvxl, lvxl′, ∆fg, shp_fg)::Tuple{SVector{K,Float64},Float64}

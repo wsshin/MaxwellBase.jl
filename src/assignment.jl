@@ -272,11 +272,11 @@ function assign_param!(
         gt_cmp = Kfv̲1==1 ? gt₀ : gt4Fw(nw, gt₀)
 
         # Choose the circularly shifted subscripts to use.
-        sub_cmp = t_ind(sub, gt_cmp)  # NTuple{K,Vector{Int}}
-        psub_cmp = t_ind(psub, gt_cmp)  # NTuple{K,Vector{Int}}
+        sub_cmp = getindex_col(sub, gt_cmp)  # NTuple{K,Vector{Int}}
+        psub_cmp = getindex_col(psub, gt_cmp)  # NTuple{K,Vector{Int}}
 
         # Prepare the circularly shifted locations of the field components.
-        τlcmp = view.(t_ind(τl,gt_cmp), sub_cmp)  # NTuple{K,VecFloat}: locations of Fw = Uw or Vw
+        τlcmp = view.(getindex_col(τl,gt_cmp), sub_cmp)  # NTuple{K,AbstractVector{<:Real}}: locations of Fw = Uw or Vw
 
         # Note that view() below is used to get a circularly shifted version of the
         # array, not a portion of.
@@ -442,7 +442,7 @@ function assign_val_shape_impl!(
         assign_val!(array, val, CI)
     else  # shape is not Cartesian box
         for ci = CI
-            pt = t_ind(τlcmp, ci)
+            pt = SVector(getindex.(τlcmp, ci.I))
             if pt ∈ shape
                 assign_val!(array, val, ci)
             end  # if pt ∈ shape

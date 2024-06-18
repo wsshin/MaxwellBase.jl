@@ -182,7 +182,7 @@ end
 #     α = 5e-4  # 1e-3 / 2
 #
 #     ∆x, ∆y, ∆z = α * (vxl[nX][UpperBound()] - vxl[nX][LowerBound()]), α * (vxl[nY][UpperBound()] - vxl[nY][LowerBound()]), α * (vxl[nZ][UpperBound()] - vxl[nZ][LowerBound()])
-#     # ∆x, ∆y, ∆z = α .* (t_ind(vxl, UpperBound(), UpperBound(), UpperBound()) .- t_ind(vxl, LowerBound(), LowerBound(), LowerBound()))
+#     # ∆x, ∆y, ∆z = α .* (getindex.(vxl, (UpperBound(),UpperBound(),UpperBound())) .- getindex.(vxl, (LowerBound(),LowerBound(),LowerBound())))
 #     rx, ry, rz = r
 #
 #     # println("(∆x, ∆y, ∆z) = $((∆x, ∆y, ∆z))")
