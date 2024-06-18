@@ -107,7 +107,7 @@ function smooth_param!(
             # Below, ci_1 is always +1 (i.e., not -1 depending on the grid type of field
             # component), because the field component locations lcmp exclude the ghost
             # points whereas the voxel corner locations lcmp′ include the ghost points.
-            ci_vxl′ = (ci_cmp, ci_cmp + ci_1)  # NTuple{2,SVector{3,Int}}
+            ci_vxl′ = (ci_cmp, ci_cmp + ci_1)  # NTuple{2,CartesianIndex{K}}
 
             if !is_vxl_uniform!(oind_vxl′, pind_vxl′, ci_vxl′, oind_cmp′, pind4oind)
                 # Note that pind_vxl′ is initialized at this point.
