@@ -2,7 +2,7 @@ export AbstractFieldType, Efield,Hfield
 
 export gt4ft  # functions
 
-abstract type AbstractFieldType end
+abstract type AbstractFieldType <: AbstractBinaryType end
 show(io::IO, ::MIME"text/plain", ft::AbstractFieldType) = show(io, ft)
 broadcastable(ft::AbstractFieldType) = Ref(ft)
 
