@@ -22,7 +22,7 @@ const ObjInd = UInt16  # change this to handle more than 2¹⁶ = 65536 objects
 
 # The order of inclusion matters: if types or functions in file A are used in file B, file A
 # must be included first.
-include("enumtype.jl")
+include("binarytype.jl")
 include("util.jl")
 include("unit.jl")
 include("material.jl")
