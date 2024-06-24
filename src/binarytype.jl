@@ -31,4 +31,10 @@ instances(::Type{AbstractFieldType}) = (Efield(), Hfield())
 # type ft are primal or dual grid planes in the Cartesian directions.
 # Note that the boundary field type is the type of the fields tangential to the boundary.
 # The fields defined on but normal to the boundary have the complementary type.
-gt4ft(ft::AbstractFieldType, boundft::AbstractFieldType) = (ft==boundft ? PrimalGrid() : DualGrid())
+#
+# Below, implement the following without the ternary operator:
+# gt4ft(ft::AbstractFieldType, boundft::AbstractFieldType) = (ft==boundft ? PrimalGrid() : DualGrid())
+gt4ft(::Efield, ::Efield) = PrimalGrid()
+gt4ft(::Hfield, ::Hfield) = PrimalGrid()
+gt4ft(::Efield, ::Hfield) = DualGrid()
+gt4ft(::Hfield, ::Efield) = DualGrid()
