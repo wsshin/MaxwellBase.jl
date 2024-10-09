@@ -27,10 +27,12 @@ conj(::Hfield) = Efield()
 instances(::Type{AbstractFieldType}) = (Efield(), Hfield())
 
 
-# Given boundary field types, determine whether the grid planes specified by the given field
-# type ft are primal or dual grid planes in the Cartesian directions.
+# Given a boundary field type (second argument), determine whether the grid plane specified
+# by a given field type (first argument) is the primal or dual grid plane in the Cartesian
+# directions.
+#
 # Note that the boundary field type is the type of the fields tangential to the boundary.
-# The fields defined on but normal to the boundary have the complementary type.
+# The fields defined on (but normal to) the boundary have the complementary type.
 #
 # Below, implement the following without the ternary operator:
 # gt4ft(ft::AbstractFieldType, boundft::AbstractFieldType) = (ft==boundft ? PrimalGrid() : DualGrid())
